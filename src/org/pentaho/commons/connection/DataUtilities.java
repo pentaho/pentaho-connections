@@ -18,6 +18,10 @@ package org.pentaho.commons.connection;
 import java.io.ByteArrayOutputStream;
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.dom4j.Document;
 import org.dom4j.dom.DOMDocumentFactory;
@@ -159,5 +163,56 @@ public class DataUtilities implements IPentahoDataTypes {
       // fall through and try to return the xml unformatted
     }
     return document.asXML();
+  }
+
+  /**
+   * Converts an array of objects to a list of Numbers.  If the objects are Number types, they will simply be cast,
+   * otherwise this method will attempt to convert object.toString() to a number using the provided number formats.
+   *  
+   * @param rowData
+   *            the input object array
+   * @param formats
+   *            list of {@link NumberFormat}'s used to convert the objects to {@link Number}'s
+   * @return
+   *            list of Numbers that represent the original rowData
+   */
+  public static List<Number> toNumbers(Object[] rowData, NumberFormat... formats) {
+    List<Number> numberList = new ArrayList<Number>();
+    for (int i = 0; i < rowData.length; i++) {
+      if (rowData[i] == null) {
+        throw new IllegalArgumentException(Messages.getString("DataUtilities.ERROR_0001_CANNOT_COVERT_NULL_DATA")); //$NON-NLS-1$
+      }
+      if (Number.class.isAssignableFrom(rowData[i].getClass())) {
+        numberList.add((Number) rowData[i]);
+      } else {
+        //try to convert the data to a Number using the number formats
+        for (int j = 0; j < formats.length; j++) {
+          Number num;
+          try {
+            num = formats[j].parse(rowData[i].toString());
+          } catch (ParseException e) {
+            if (j < formats.length - 1) {
+              continue;
+            }
+            else {
+              throw new IllegalArgumentException(e);
+            }
+          }
+          numberList.add(num);
+          break;
+        }
+      }
+    }
+    return numberList;
+  }
+  
+  /**
+   * Convenience wrapper for {@link DataUtilities#toNumbers(Object[], NumberFormat[])}
+   * @param data to convert to a number
+   * @param formats
+   * @return a number
+   */
+  public static Number toNumber(Object data, NumberFormat...formats) {
+    return toNumbers(new Object[] { data }, formats).get(0);
   }
 }
