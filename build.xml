@@ -29,7 +29,7 @@
 	</target>
 
 	<target name="clean-dist">
-		<delete dir="dist"/>
+		<delete dir="${dist.dir}"/>
 	</target>
 
 	<target name="compile" depends="clean, init">
