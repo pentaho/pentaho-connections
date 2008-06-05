@@ -33,13 +33,13 @@ public interface IPentahoConnection {
 
   public static final int NONE_DATASOURCE = -1;
 
-  public static final int SQL_DATASOURCE = 0;
+  public static final String SQL_DATASOURCE = "SQL";
 
-  public static final int MDX_DATASOURCE = 1;
+  public static final String MDX_DATASOURCE = "MDX";
 
-  public static final int XML_DATASOURCE = 2;
+  public static final String XML_DATASOURCE = "XML";
 
-  public static final int HQL_DATASOURCE = 3;
+  public static final String HQL_DATASOURCE = "HQL";
 
   /**
    * Setting for class name used to look up a connection in the pentaho.xml.
@@ -83,11 +83,28 @@ public interface IPentahoConnection {
   public static final String QUERY_KEY = "query"; //$NON-NLS-1$
 
   /**
+   * Standard key to use for a connection property.
+   */
+  public static final String CONNECTION = "connection"; //$NON-NLS-1$
+
+  /**
+   * Standard key to use for a provider property.
+   */
+  public static final String PROVIDER = "provider"; //$NON-NLS-1$
+
+  /**
    * Array of the XML element keys defined above.
    */
   public static final String[] KEYS = new String[] { CLASSNAME_KEY, JNDI_NAME_KEY, DRIVER_KEY, LOCATION_KEY,
       USERNAME_KEY, PASSWORD_KEY, QUERY_KEY };
 
+  /**
+   * Sets the properties to be used when the connection is made. The standard 
+   * keys for the properties are defined in this interface
+   * @param props
+   */
+  void setProperties( Properties props );
+  
   /**
    * closes the connection
    */
@@ -169,5 +186,6 @@ public interface IPentahoConnection {
    * returns the type of connection
    * @return
    */
-  public int getDatasourceType();
+  public String getDatasourceType();
+  
 }

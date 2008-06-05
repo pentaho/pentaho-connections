@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0">
+    <info organisation="pentaho" module="pentaho-connections"/>
+    <dependencies defaultconf="*->default">
+        <!--  external dependencies -->
+ 	    <dependency org="commons-collections" name="commons-collections" rev="3.2"/>
+        <dependency org="dom4j"               name="dom4j"               rev="1.6.1"/>
+        <dependency org="javax.activation"    name="activation"          rev="1.1"/>
+    </dependencies>
+</ivy-module>
