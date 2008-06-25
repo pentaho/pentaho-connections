@@ -1,0 +1,191 @@
+<project name="common-build"  xmlns:ivy="antlib:org.apache.ivy.ant">
+
+	<property file="override.properties" />
+	<property file="build.properties" />
+
+	<property name="ivy.install.version" value="2.0.0-beta2" />
+
+	<property name="ivy.default.ivy.user.dir" value="${user.home}/.ivy2" />
+    <property name="ivy.jar.dir" value="${ivy.default.ivy.user.dir}/jars" />
+	<property name="ivy.jar.file" value="${ivy.jar.dir}/ivybeta1.jar" />
+	
+	<property name="src.dir" value="src"/>
+	<property name="testsrc.dir" value="test-src"/>
+	<property name="bin.dir" value="bin"/>
+	<property name="testbin.dir" value="testbin"/>
+	<property name="lib.dir" value="ivy-lib"/>
+	<property name="testlib.dir" value="ivy-testlib"/>
+	<property name="dist.dir" value="dist"/>
+	<property name="license.dir" value="."/>
+	
+	<property name="javac.debug" value="true"/>
+	<property name="javac.optimize" value="true"/>
+	<property name="javac.deprecation" value="true"/>
+	<property name="build.source" value="1.5"/>
+	<property name="build.target" value="1.5"/>
+	
+	<property name="impl.vendor" value="Pentaho Corporation"/>
+	
+	<path id="classpath">
+		<fileset dir="${lib.dir}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+		
+	<path id="test.classpath">
+		<fileset dir="${lib.dir}">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${testlib.dir}">
+			<include name="*.jar" />
+		</fileset>
+		<dirset dir="bin"/>
+		<dirset dir="testbin"/>
+	</path>
+	
+	<target name="download-ivy" unless="skip.download">
+        <mkdir dir="${ivy.jar.dir}"/>
+        <get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
+                 dest="${ivy.jar.file}" usetimestamp="true"/>
+	</target>
+	
+    <target name="install-ivy" depends="download-ivy">
+        <path id="ivy.lib.path">
+            <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+        </path>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml"
+                  uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+    	<ivy:settings url="${ivy.settingsurl}"/>
+    </target>
+    	
+    <target name="resolve" unless="offline" depends="install-ivy">
+        <ivy:resolve file="ivy.xml" />
+        <ivy:retrieve conf="default" pattern="${lib.dir}/[module].[ext]"/>
+    	<ivy:retrieve conf="test" pattern="${testlib.dir}/[module].[ext]"/>
+    </target>
+    
+	<target name="report" depends="install-ivy">
+        <ivy:resolve file="ivy.xml" />
+		<ivy:report conf="default" />		
+	</target>
+	
+   	<target name="publish-local-nojar" depends="install-ivy">
+		<ivy:resolve file="ivy.xml" />
+		<ivy:publish resolver="local" pubrevision="${project.revision}" overwrite="true">
+   			<artifacts  pattern="${dist.dir}/[artifact].[ext]" />
+		</ivy:publish>
+	</target>
+		
+	<target name="publish-local" depends="clean, jar, publish-local-nojar"/>
+		
+	<target name="publish-pentaho-nojar" depends="install-ivy">
+		<!-- TODO: work with Aaron on publishing to repo -->
+		<ivy:publish resolver="shared" pubrevision="${project.revision}" overwrite="true">
+   			<artifacts  pattern="${dist.dir}/[artifact].[ext]" />
+		</ivy:publish>
+	</target>
+	
+	<target name="clean-local" depends="install-ivy">
+		<ivy:info file="ivy.xml" />
+		<delete dir="${ivy.local.default.root}/${ivy.organisation}/${ivy.module}/${project.revision}"/>
+	</target>
+	
+	<target name="clean-jars">
+		<delete dir="${lib.dir}"/>
+		<delete dir="${testlib.dir}"/>
+	</target>
+	
+	<target name="clean">
+		<delete dir="${bin.dir}" />
+		<delete dir="${testbin.dir}" />
+		<delete dir="${dist.dir}" />
+	</target>
+	
+	<target name="init">
+		<mkdir dir="${bin.dir}"/>
+		<mkdir dir="${testbin.dir}"/>
+		<mkdir dir="${dist.dir}"/>
+	</target>
+	
+	<target name="copy-license-lgpl" if="lgpl-license-avail">
+   		<copy todir="${bin.dir}/META-INF">
+   			<fileset dir="${license.dir}" includes="lgpl-2.1.txt" />
+		</copy>
+	</target>
+	
+	<target name="copy-license-gpl-parent" if="gpl-parent-license-avail">
+   		<copy todir="${bin.dir}/META-INF">
+   			<fileset dir="../.." includes="gpl-2.0.txt" />
+		</copy>
+	</target>
+	
+	<target name="compile" depends="init, resolve">
+		<javac destdir="${bin.dir}" debug="${javac.debug}" optimize="${javac.optimize}" 
+			   deprecation="${javac.deprecation}" fork="true" source="${build.source}" 
+			   target="${build.target}">
+			<classpath>
+				<path refid="classpath" />
+			</classpath>
+			<src path="${src.dir}" />
+		</javac>
+		<copy todir="${bin.dir}" flatten="false">
+			<fileset dir="${src.dir}" includes="**/*.png  **/*.gif **/*.xml **/*.html **/*properties **/*.xsl **/*.js **/*.css **/*.xsd **/*.tld **/*.dsp" />
+		</copy>
+		<condition property="lgpl-license-avail">
+			<available file="${license.dir}/lgpl-2.1.txt"/>
+		</condition>
+		<antcall target="copy-license-lgpl"/>
+		<condition property="gpl-parent-license-avail">
+			<available file="../../gpl-2.0.txt"/>
+		</condition>
+		<antcall target="copy-license-gpl-parent"/>
+	</target>
+	
+	<target name="jar" depends="compile">
+		<ivy:info file="ivy.xml" />
+		<jar destfile="${dist.dir}/${ivy.module}.jar">
+			<manifest>
+				<attribute name="Implementation-Title" value="${impl.title}" />
+				<attribute name="Implementation-Version" value="${project.revision}" />
+				<attribute name="Implementation-Vendor" value="${impl.vendor}" />
+				<attribute name="Implementation-ProductID" value="${impl.productID}" />
+			</manifest>
+			<fileset dir="${bin.dir}"/>
+		</jar>
+	</target>
+
+	<target name="srcjar" depends="compile">
+		<ivy:info file="ivy.xml" />
+		<jar destfile="${dist.dir}/${ivy.module}.jar">
+			<manifest>
+				<attribute name="Implementation-Title" value="${impl.title}" />
+				<attribute name="Implementation-Version" value="${project.revision}-src" />
+				<attribute name="Implementation-Vendor" value="${impl.vendor}" />
+				<attribute name="Implementation-ProductID" value="${impl.productID}" />
+			</manifest>
+			<fileset dir="${bin.dir}"/>
+			<fileset dir="${src.dir}"/>
+		</jar>
+	</target>
+
+	<target name="test" depends="compile">
+		<javac destdir="${testbin.dir}" debug="true" optimize="false" source="${build.source}" target="${build.target}" fork="true">
+			<src path="${testsrc.dir}"/>
+			<classpath refid="test.classpath"/>
+		</javac>
+		
+	    <junit printsummary="yes" haltonfailure="yes">
+	      <classpath refid="test.classpath"/>
+	      <formatter type="plain"/>
+	      <batchtest fork="yes" todir="testbin">
+	        <fileset dir="${testsrc.dir}" casesensitive="yes">
+	          <include name="**/Test*.java"/>
+	          <include name="**/*Test.java"/>
+	        </fileset>
+	      </batchtest>
+	    </junit>
+	</target>
+
+    <target name="dist" depends="jar"/>
+		
+</project>
