@@ -60,8 +60,8 @@
     	
     <target name="resolve" unless="offline" depends="install-ivy">
         <ivy:resolve file="ivy.xml" />
-        <ivy:retrieve conf="default" pattern="${lib.dir}/[module].[ext]"/>
-    	<ivy:retrieve conf="test" pattern="${testlib.dir}/[module].[ext]"/>
+        <ivy:retrieve conf="default" pattern="${lib.dir}/[module]-[revision].[ext]"/>
+    	<ivy:retrieve conf="test" pattern="${testlib.dir}/[module]-[revision].[ext]"/>
     </target>
     
 	<target name="report" depends="install-ivy">
