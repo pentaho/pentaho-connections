@@ -78,11 +78,21 @@
 		
 	<target name="publish-local" depends="clean, jar, publish-local-nojar"/>
 		
-	<target name="publish-pentaho-nojar" depends="install-ivy">
-		<!-- TODO: work with Aaron on publishing to repo -->
-		<ivy:publish resolver="shared" pubrevision="${project.revision}" overwrite="true">
-   			<artifacts  pattern="${dist.dir}/[artifact].[ext]" />
-		</ivy:publish>
+	<target name="publish-pentaho" depends="clean, jar, publish-pentaho-nojar"/>
+			
+	<target name="publish-pentaho-nojar">
+		<exec executable="cmd">
+			<arg value="/c" />
+			<arg value="mvn.bat" />
+			<arg value="deploy:deploy-file" />
+			<arg value="-DrepositoryId=${ivy.repository.id}"/>
+			<arg value="-Durl=${ivy.repository.publish}"/>
+			<arg value="-DgroupId=${ivy.artifact.group}"/>
+			<arg value="-DartifactId=${ivy.artifact.id}"/>
+			<arg value="-Dversion=${project.revision}"/>
+			<arg value="-Dpackaging=jar"/>
+			<arg value="-Dfile=${dist.dir}/${ivy.module}.jar"/>
+		</exec>
 	</target>
 	
 	<target name="clean-local" depends="install-ivy">
