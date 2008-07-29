@@ -63,19 +63,20 @@
 		
 	<target name="publish-pentaho" depends="clean, jar, publish-pentaho-nojar"/>
 			
-	<target name="publish-pentaho-nojar">
+	<target name="publish-pentaho-nojar" depends="create-pom">
 		<exec executable="cmd">
 			<arg value="/c" />
 			<arg value="mvn.bat" />
 			<arg value="deploy:deploy-file" />
 			<arg value="-DrepositoryId=${ivy.repository.id}"/>
 			<arg value="-Durl=${ivy.repository.publish}"/>
-			<arg value="-DgroupId=${ivy.artifact.group}"/>
-			<arg value="-DartifactId=${ivy.artifact.id}"/>
-			<arg value="-Dversion=${project.revision}"/>
-			<arg value="-Dpackaging=jar"/>
+			<arg value="-DpomFile=${dist.dir}/pom.xml" />
 			<arg value="-Dfile=${dist.dir}/${ivy.module}.jar"/>
 		</exec>
+	</target>
+	
+	<target name="create-pom" depends="install-ivy">
+		<ivy:makepom ivyfile="./ivy.xml" pomfile="${dist.dir}/pom.xml"/>
 	</target>
 	
 	<target name="clean-local" depends="install-ivy">
