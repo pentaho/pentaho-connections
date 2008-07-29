@@ -1,5 +1,7 @@
 <project name="Pentaho Build" xmlns:ivy="antlib:org.apache.ivy.ant" basedir="." default="jar">
 
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
+	
 	<property file="override.properties" />
 	<property file="build.properties" />
 
@@ -64,20 +66,42 @@
 	<target name="publish-pentaho" depends="clean, jar, publish-pentaho-nojar"/>
 			
 	<target name="publish-pentaho-nojar" depends="create-pom">
-		<exec executable="cmd">
-			<arg value="/c" />
-			<arg value="mvn.bat" />
-			<arg value="deploy:deploy-file" />
-			<arg value="-DrepositoryId=${ivy.repository.id}"/>
-			<arg value="-Durl=${ivy.repository.publish}"/>
-			<arg value="-DpomFile=${dist.dir}/pom.xml" />
-			<arg value="-Dfile=${dist.dir}/${ivy.module}.jar"/>
-		</exec>
+	  <sequential>
+		<fail message="Required jar not present!">
+		   <condition>
+		   	 <isset property="${dist.dir}/${ivy.module}.jar"/>
+		   </condition>	
+	  	</fail>
+	  	<if>
+	  	  <os family="windows"/>	
+		  	<then>
+				<exec executable="cmd">
+					<arg value="/c" />
+					<arg value="mvn.bat" />
+					<arg value="deploy:deploy-file" />
+					<arg value="-DrepositoryId=${ivy.repository.id}"/>
+					<arg value="-Durl=${ivy.repository.publish}"/>
+					<arg value="-DpomFile=${dist.dir}/pom.xml" />
+					<arg value="-Dfile=${dist.dir}/${ivy.module}.jar"/>
+				</exec>
+		    </then>
+		  	<else>
+		  		<exec executable="mvn">
+					<arg value="deploy:deploy-file" />
+					<arg value="-DrepositoryId=${ivy.repository.id}"/>
+					<arg value="-Durl=${ivy.repository.publish}"/>
+					<arg value="-DpomFile=${dist.dir}/pom.xml" />
+					<arg value="-Dfile=${dist.dir}/${ivy.module}.jar"/>
+				</exec>
+		  	</else>	
+	  	</if>  	
+	  </sequential>
 	</target>
 	
 	<target name="create-pom" depends="install-ivy">
 		<ivy:makepom ivyfile="./ivy.xml" pomfile="${dist.dir}/pom.xml"/>
 	</target>
+	
 	
 	<target name="clean-local" depends="install-ivy">
 		<ivy:info file="ivy.xml" />
