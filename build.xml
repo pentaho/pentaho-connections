@@ -28,13 +28,13 @@
 		<dirset dir="testbin"/>
 	</path>
 	
-	<target name="download-ivy" unless="skip.download">
+	<target name="download-ivy" unless="offline">
         <mkdir dir="${ivy.jar.dir}"/>
         <get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
                  dest="${ivy.jar.file}" usetimestamp="true"/>
 	</target>
 	
-    <target name="install-ivy" depends="download-ivy">
+    <target name="install-ivy" unless="offline" depends="download-ivy">
         <path id="ivy.lib.path">
             <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
         </path>
@@ -104,7 +104,6 @@
 	
 	
 	<target name="clean-local" depends="install-ivy">
-		<ivy:info file="ivy.xml" />
 		<delete dir="${ivy.local.default.root}/${ivy.organisation}/${ivy.module}/${project.revision}"/>
 	</target>
 	
@@ -162,7 +161,6 @@
 	</target>
 	
 	<target name="jar" depends="compile">
-		<ivy:info file="ivy.xml" />
 		<jar destfile="${dist.dir}/${ivy.module}.jar">
 			<manifest>
 				<attribute name="Implementation-Title" value="${impl.title}" />
@@ -175,7 +173,6 @@
 	</target>
 
 	<target name="srcjar" depends="compile">
-		<ivy:info file="ivy.xml" />
 		<jar destfile="${dist.dir}/${ivy.module}.jar">
 			<manifest>
 				<attribute name="Implementation-Title" value="${impl.title}" />
