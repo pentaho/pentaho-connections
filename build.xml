@@ -1,215 +1,27 @@
-<project name="Pentaho Build" xmlns:ivy="antlib:org.apache.ivy.ant" basedir="." default="jar">
+<!--===========================================================================
+  This is the build file for the Pentaho Commons Connections project.
+  
+  This build file will use the common_build.xml file as the default build
+  process and should only override the tasks that need to differ from
+  the common build file.
+  
+  See common_build.xml for more details
+============================================================================-->
+<project name="Pentaho Commons - Connections" basedir="." default="jar" 
+	xmlns:ivy="antlib:org.apache.ivy.ant" >
+	
+	<description>
+	  This build file is used to create the Pentaho Commons Connections project
+		and works with the common_build.xml file.
+	</description>
 
-	<taskdef resource="net/sf/antcontrib/antcontrib.properties"/>
-	
-	<property file="override.properties" />
-	<property file="build.properties" />
-	
-	<!-- Ivy properties -->
-	<property name="ivy.install.version" value="2.0.0-beta2" />
-	<property name="ivy.default.ivy.user.dir" value="${user.home}/.ivy2" />
-    <property name="ivy.jar.dir" value="${ivy.default.ivy.user.dir}/jars" />
-	<property name="ivy.jar.file" value="${ivy.jar.dir}/ivybeta1.jar" />
-	
-	<path id="classpath">
-		<fileset dir="${lib.dir}">
-			<include name="*.jar" />
-		</fileset>
-	</path>
-		
-	<path id="test.classpath">
-		<fileset dir="${lib.dir}">
-			<include name="*.jar" />
-		</fileset>
-		<fileset dir="${testlib.dir}">
-			<include name="*.jar" />
-		</fileset>
-		<dirset dir="bin"/>
-		<dirset dir="testbin"/>
-	</path>
-	
-	<target name="download-ivy" unless="offline">
-        <mkdir dir="${ivy.jar.dir}"/>
-        <get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
-                 dest="${ivy.jar.file}" usetimestamp="true"/>
-	</target>
-	
-    <target name="install-ivy" depends="download-ivy" unless="offline">
-        <path id="ivy.lib.path">
-            <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
-        </path>
-        <taskdef resource="org/apache/ivy/ant/antlib.xml"
-                  uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
-    	<ivy:settings url="${ivy.settingsurl}"/>
-    </target>
-    	
-    <target name="resolve" depends="install-ivy" unless="offline">
-        <ivy:resolve file="ivy.xml" />
-        <ivy:retrieve conf="default" pattern="${lib.dir}/[module]-[revision].[ext]"/>
-    	<ivy:retrieve conf="test" pattern="${testlib.dir}/[module]-[revision].[ext]"/>
-    </target>
-    
-	<target name="report" depends="install-ivy" unless="offline">
-        <ivy:resolve file="ivy.xml" />
-		<ivy:report conf="default" />		
-	</target>
-	
-   	<target name="publish-local-nojar" depends="install-ivy">
-		<ivy:resolve file="ivy.xml" />
-		<ivy:publish resolver="local" pubrevision="${project.revision}" overwrite="true">
-   			<artifacts  pattern="${dist.dir}/[artifact].[ext]" />
-		</ivy:publish>
-	</target>
-		
-	<target name="publish-local" depends="clean, jar, publish-local-nojar"/>
-		
-	<target name="publish-pentaho" depends="clean, jar, publish-pentaho-nojar"/>
-			
-	<target name="publish-pentaho-nojar" depends="create-pom">
-	  <sequential>
-		<fail message="Required jar not present!">
-		   <condition>
-		   	 <isset property="${dist.dir}/${ivy.artifact.id}.jar"/>
-		   </condition>	
-	  	</fail>
-	  	<if>
-	  	  <os family="windows"/>	
-		  	<then>
-				<exec executable="cmd">
-					<arg value="/c" />
-					<arg value="mvn.bat" />
-					<arg value="deploy:deploy-file" />
-					<arg value="-DrepositoryId=${ivy.repository.id}"/>
-					<arg value="-Durl=${ivy.repository.publish}"/>
-					<arg value="-DpomFile=${dist.dir}/pom.xml" />
-					<arg value="-Dfile=${dist.dir}/${ivy.artifact.id}.jar"/>
-				</exec>
-		    </then>
-		  	<else>
-		  		<exec executable="mvn">
-					<arg value="deploy:deploy-file" />
-					<arg value="-DrepositoryId=${ivy.repository.id}"/>
-					<arg value="-Durl=${ivy.repository.publish}"/>
-					<arg value="-DpomFile=${dist.dir}/pom.xml" />
-					<arg value="-Dfile=${dist.dir}/${ivy.artifact.id}.jar"/>
-				</exec>
-		  	</else>	
-	  	</if>  	
-	  </sequential>
-	</target>
-	
-	<target name="create-pom" depends="install-ivy">
-		<ivy:makepom ivyfile="./ivy.xml" pomfile="${dist.dir}/pom.xml"/>
-	</target>
-	
-	<target name="clean-local" depends="install-ivy">
-		<delete dir="${ivy.local.default.root}/${ivy.organisation}/${ivy.module}/${project.revision}"/>
-	</target>
-	
-	<target name="clean-jars">
-		<delete dir="${lib.dir}"/>
-		<delete dir="${testlib.dir}"/>
-	</target>
-	
-	<target name="clean">
-		<delete dir="${bin.dir}" />
-		<delete dir="${testbin.dir}" />
-		<delete dir="${dist.dir}" />
-	</target>
-	
-	<target name="clean-all" depends="clean, clean-jars"/>
+	<!-- Import the common_build.xml file which contains all the default tasks -->	
+	<import file="common_build.xml"/>
 
-    <target name="init">
-		<mkdir dir="${bin.dir}"/>
-		<mkdir dir="${testbin.dir}"/>
-		<mkdir dir="${dist.dir}"/>
-	</target>
-	
-	<target name="copy-license-lgpl" if="lgpl-license-avail">
-   		<copy todir="${bin.dir}/META-INF">
-   			<fileset dir="${license.dir}" includes="lgpl-2.1.txt" />
-		</copy>
-	</target>
-	
-	<target name="copy-license-gpl-parent" if="gpl-parent-license-avail">
-   		<copy todir="${bin.dir}/META-INF">
-   			<fileset dir="../.." includes="gpl-2.0.txt" />
-		</copy>
-	</target>
-	
-	<target name="compile" depends="init, resolve">
-		<javac destdir="${bin.dir}" debug="${javac.debug}" optimize="${javac.optimize}" 
-			   deprecation="${javac.deprecation}" fork="true" source="${build.source}" 
-			   target="${build.target}">
-			<classpath>
-				<path refid="classpath" />
-			</classpath>
-			<src path="${src.dir}" />
-		</javac>
-		<copy todir="${bin.dir}" flatten="false">
-			<fileset dir="${src.dir}"/>
-		</copy>
-		<antcall target="copy-hibernate-resources"/>
-		<condition property="lgpl-license-avail">
-			<available file="${license.dir}/lgpl-2.1.txt"/>
-		</condition>
-		<antcall target="copy-license-lgpl"/>
-		<condition property="gpl-parent-license-avail">
-			<available file="../../gpl-2.0.txt"/>
-		</condition>
-		<antcall target="copy-license-gpl-parent"/>
-	</target>
-	
-	<target name="copy-hibernate-resources" if="res.dir">
-		<echo>Copying hbm.xml documents to classes/hibernate directory...</echo>
-		<copy todir="${bin.dir}">
-			<fileset dir="${res.dir}" includes="**/*.hbm.xml" />
-		</copy>
-	</target>
-	
-	<target name="jar" depends="compile">
-		<jar destfile="${dist.dir}/${ivy.artifact.id}.jar">
-			<manifest>
-				<attribute name="Implementation-Title" value="${impl.title}" />
-				<attribute name="Implementation-Version" value="${project.revision}" />
-				<attribute name="Implementation-Vendor" value="${impl.vendor}" />
-				<attribute name="Implementation-ProductID" value="${impl.productID}" />
-			</manifest>
-			<fileset dir="${bin.dir}"/>
-		</jar>
-	</target>
+    <!--
+      AS STATED ABOVE, THE ONLY TASKS THAT SHOULD EXIST IN THIS BUILD FILE ARE
+      THE TASKS THAT NEED TO DIFFER FROM THE DEFAULT IMPLEMENTATION OF THE TASKS
+      FOUND IN common_build.xml.
+    --> 
 
-	<target name="srcjar" depends="compile">
-		<jar destfile="${dist.dir}/${ivy.artifact.id}.jar">
-			<manifest>
-				<attribute name="Implementation-Title" value="${impl.title}" />
-				<attribute name="Implementation-Version" value="${project.revision}-src" />
-				<attribute name="Implementation-Vendor" value="${impl.vendor}" />
-				<attribute name="Implementation-ProductID" value="${impl.productID}" />
-			</manifest>
-			<fileset dir="${bin.dir}"/>
-			<fileset dir="${src.dir}"/>
-		</jar>
-	</target>
-
-	<target name="test" depends="compile">
-		<javac destdir="${testbin.dir}" debug="true" optimize="false" source="${build.source}" target="${build.target}" fork="true">
-			<src path="${testsrc.dir}"/>
-			<classpath refid="test.classpath"/>
-		</javac>
-		
-	    <junit printsummary="yes" haltonfailure="yes">
-	      <classpath refid="test.classpath"/>
-	      <formatter type="plain"/>
-	      <batchtest fork="yes" todir="testbin">
-	        <fileset dir="${testsrc.dir}" casesensitive="yes">
-	          <include name="**/Test*.java"/>
-	          <include name="**/*Test.java"/>
-	        </fileset>
-	      </batchtest>
-	    </junit>
-	</target>
-
-    <target name="dist" depends="jar"/>
-		
 </project>
