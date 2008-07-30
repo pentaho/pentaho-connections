@@ -4,7 +4,7 @@
 	
 	<property file="override.properties" />
 	<property file="build.properties" />
-
+	
 	<!-- Ivy properties -->
 	<property name="ivy.install.version" value="2.0.0-beta2" />
 	<property name="ivy.default.ivy.user.dir" value="${user.home}/.ivy2" />
@@ -34,7 +34,7 @@
                  dest="${ivy.jar.file}" usetimestamp="true"/>
 	</target>
 	
-    <target name="install-ivy" unless="offline" depends="download-ivy">
+    <target name="install-ivy" depends="download-ivy" unless="offline">
         <path id="ivy.lib.path">
             <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
         </path>
@@ -43,13 +43,13 @@
     	<ivy:settings url="${ivy.settingsurl}"/>
     </target>
     	
-    <target name="resolve" unless="offline" depends="install-ivy">
+    <target name="resolve" depends="install-ivy" unless="offline">
         <ivy:resolve file="ivy.xml" />
         <ivy:retrieve conf="default" pattern="${lib.dir}/[module]-[revision].[ext]"/>
     	<ivy:retrieve conf="test" pattern="${testlib.dir}/[module]-[revision].[ext]"/>
     </target>
     
-	<target name="report" depends="install-ivy">
+	<target name="report" depends="install-ivy" unless="offline">
         <ivy:resolve file="ivy.xml" />
 		<ivy:report conf="default" />		
 	</target>
@@ -69,7 +69,7 @@
 	  <sequential>
 		<fail message="Required jar not present!">
 		   <condition>
-		   	 <isset property="${dist.dir}/${ivy.module}.jar"/>
+		   	 <isset property="${dist.dir}/${ivy.artifact.id}.jar"/>
 		   </condition>	
 	  	</fail>
 	  	<if>
@@ -82,7 +82,7 @@
 					<arg value="-DrepositoryId=${ivy.repository.id}"/>
 					<arg value="-Durl=${ivy.repository.publish}"/>
 					<arg value="-DpomFile=${dist.dir}/pom.xml" />
-					<arg value="-Dfile=${dist.dir}/${ivy.module}.jar"/>
+					<arg value="-Dfile=${dist.dir}/${ivy.artifact.id}.jar"/>
 				</exec>
 		    </then>
 		  	<else>
@@ -91,7 +91,7 @@
 					<arg value="-DrepositoryId=${ivy.repository.id}"/>
 					<arg value="-Durl=${ivy.repository.publish}"/>
 					<arg value="-DpomFile=${dist.dir}/pom.xml" />
-					<arg value="-Dfile=${dist.dir}/${ivy.module}.jar"/>
+					<arg value="-Dfile=${dist.dir}/${ivy.artifact.id}.jar"/>
 				</exec>
 		  	</else>	
 	  	</if>  	
@@ -101,7 +101,6 @@
 	<target name="create-pom" depends="install-ivy">
 		<ivy:makepom ivyfile="./ivy.xml" pomfile="${dist.dir}/pom.xml"/>
 	</target>
-	
 	
 	<target name="clean-local" depends="install-ivy">
 		<delete dir="${ivy.local.default.root}/${ivy.organisation}/${ivy.module}/${project.revision}"/>
@@ -148,8 +147,9 @@
 			<src path="${src.dir}" />
 		</javac>
 		<copy todir="${bin.dir}" flatten="false">
-			<fileset dir="${src.dir}" includes="**/*.png  **/*.gif **/*.xml **/*.html **/*properties **/*.xsl **/*.js **/*.css **/*.xsd **/*.tld **/*.dsp" />
+			<fileset dir="${src.dir}"/>
 		</copy>
+		<antcall target="copy-hibernate-resources"/>
 		<condition property="lgpl-license-avail">
 			<available file="${license.dir}/lgpl-2.1.txt"/>
 		</condition>
@@ -160,8 +160,15 @@
 		<antcall target="copy-license-gpl-parent"/>
 	</target>
 	
+	<target name="copy-hibernate-resources" if="res.dir">
+		<echo>Copying hbm.xml documents to classes/hibernate directory...</echo>
+		<copy todir="${bin.dir}">
+			<fileset dir="${res.dir}" includes="**/*.hbm.xml" />
+		</copy>
+	</target>
+	
 	<target name="jar" depends="compile">
-		<jar destfile="${dist.dir}/${ivy.module}.jar">
+		<jar destfile="${dist.dir}/${ivy.artifact.id}.jar">
 			<manifest>
 				<attribute name="Implementation-Title" value="${impl.title}" />
 				<attribute name="Implementation-Version" value="${project.revision}" />
@@ -173,7 +180,7 @@
 	</target>
 
 	<target name="srcjar" depends="compile">
-		<jar destfile="${dist.dir}/${ivy.module}.jar">
+		<jar destfile="${dist.dir}/${ivy.artifact.id}.jar">
 			<manifest>
 				<attribute name="Implementation-Title" value="${impl.title}" />
 				<attribute name="Implementation-Version" value="${project.revision}-src" />
