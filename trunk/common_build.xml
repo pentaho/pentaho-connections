@@ -108,9 +108,9 @@
             value="${build.cache.dir}/pentaho"
             description="Directory where the Pentaho ant tasks jar (and dependencies) is placed after it is auto-downloaded by the build" />
   <property name="svnant.build.cache.dir"
-	            value="${build.cache.dir}/svnant"
-	            description="Directory where the SVN ANT install is placed after it is auto downloaded by the build" />
-	  
+            value="${build.cache.dir}/svnant"
+            description="Directory where the SVN ANT install is placed after it is auto downloaded by the build" />
+
   <!-- Ivy properties -->
   <property name="ivy.install.version" value="2.0.0-beta2" description="Specifies the version of IVY to fetch" />
   <property name="ivy.jar.file"
@@ -122,10 +122,18 @@
   <property name="ivy.artifact.group"
             value="pentaho"
             description="IVY metadata describing the originating company or organization" />
-	
+
   <!-- SVN Ant Properties -->
-  <property name="svnant.release" value="http://subclipse.tigris.org/files/documents/906/43359/svnant-1.2.0-RC1.zip" description="The current release of SVN Ant"/>
-	
+  <property name="svnant.url"
+            value="http://subclipse.tigris.org/files/documents/906/43359/svnant-1.2.0-RC1.zip"
+            description="The URL to the current release of SVN Ant" />
+  <property name="svnant.use-javahl"
+            value="false"
+            description="Set this to true if you want svnant to prefer JNI JavaHL binding over the command line client for native svn support" />
+  <property name="svnant.use-svnkit"
+            value="false"
+            description="Set this to true if you want svnant to prefer SVNKit binding over the command line client for native svn support" />
+
   <!-- Test properties -->
   <property name="testsrc.dir" value="${basedir}/test-src" description="Directory that hosts the test source files" />
   <property name="testlib.dir"
@@ -314,8 +322,7 @@
     <antcall target="svnant.download" />
   </target>
 
-	
-	
+
   <!--=======================================================================
       svnant.download
     
@@ -323,17 +330,16 @@
       ====================================================================-->
   <target name="svnant.download" unless="svnant.available">
     <mkdir dir="${svnant.build.cache.dir}" />
-    <get src="${svnant.release}" 
-         dest="${svnant.build.cache.dir}/svnant.zip"
-         usetimestamp="true" />
-    <unzip src="${svnant.build.cache.dir}/svnant.zip" dest="${svnant.build.cache.dir}">
-      <patternset>
+    <get src="${svnant.url}" dest="${svnant.build.cache.dir}/svnant.zip" usetimestamp="true" />
+    <unzip src="${svnant.build.cache.dir}/svnant.zip" dest="${svnant.build.cache.dir}" >
+          <patternset>
         <include name="**/*.jar" />
       </patternset>
     </unzip>
   </target>
 
-<!--=======================================================================
+
+  <!--=======================================================================
     install-svnant
     
     (Fetches and) installs the SVN ANT for use by this ant script
@@ -357,30 +363,36 @@
     </if>
   </target>
 
+
   <!--=======================================================================
         test-svnant
     
         Tests SVN by printing out the repository
         ====================================================================-->
   <target name="test-svnant" depends="install-svnant">
-    <svn>
+    <svn javahl="${svnant.use-javahl}" svnkit="${svnant.use-svnkit}">
       <wcVersion path="." />
     </svn>
     <echo message="Subversion repository url: ${repository.url}" />
-  </target>	
+  </target>
+
 
   <!--=======================================================================
         svn-revision
     
         Tests SVN by printing out the repository
         ====================================================================-->
-  <target name="svn-revision" depends="install-svnant">
-    <svn>
-      <status path="." revisionProperty="repository.revision" />
+  <target name="svn-revision"
+          depends="install-svnant"
+          description="Prints and sets the SVN revision for the repository at the current dir">
+
+    <svn javahl="${svnant.use-javahl}" svnkit="${svnant.use-svnkit}">
+      <status path="." revisionProperty="svn.revision" />
     </svn>
-    <echo message="Subversion repository revision: ${repository.revision}" />
+    <echo message="Subversion repository revision: ${svn.revision}" />
   </target>
-	
+
+
   <!--=======================================================================
 	    install-ivy
 	    
@@ -441,10 +453,6 @@
          usetimestamp="true" />
   </target>
 
-	
-
-
-	
 
   <!--=======================================================================
 	    resolve
@@ -834,11 +842,11 @@
 	    
 	    Creates a jar file from the bin directory
 	    ====================================================================-->
-  <target name="jar" depends="compile" description="Jars up the bin directory after a compile">
+  <target name="jar" depends="compile,svn-revision" description="Jars up the bin directory after a compile">
     <jar destfile="${dist.dir}/${ivy.artifact.id}-${project.revision}.jar">
       <manifest>
         <attribute name="Implementation-Title" value="${impl.title}" />
-        <attribute name="Implementation-Version" value="${project.revision}" />
+        <attribute name="Implementation-Version" value="${project.revision}-b${svn.revision}" />
         <attribute name="Implementation-Vendor" value="${impl.vendor}" />
         <attribute name="Implementation-ProductID" value="${impl.productID}" />
       </manifest>
@@ -982,8 +990,8 @@
   <target name="continuous"
           depends="clean-all,resolve,cobertura,dist-javadoc,dist-source,dist"
           description="Runs a typical continuous integration build" />
-  
-  
+
+
   <!--=======================================================================
 	    continuous-testless
 	    
