@@ -111,18 +111,6 @@
             value="${build.cache.dir}/svnant"
             description="Directory where the SVN ANT install is placed after it is auto downloaded by the build" />
 
-  <!-- Ivy properties -->
-  <property name="ivy.install.version" value="2.0.0-beta2" description="Specifies the version of IVY to fetch" />
-  <property name="ivy.jar.file"
-            value="${ivy.build.cache.dir}/ivybeta1.jar"
-            description="The full path to the IVY jar file to use during the build.  If the file is not present, the build will attempt to fetch IVY and save the jar as specified by this property" />
-  <property name="ivy.settingsurl"
-            value="file:${basedir}/ivysettings.xml"
-            description="URL to the (common) ivysettings.xml.  This file is required by the build to configure IVY.  Note you must escape the ':' if this property exists in a .properties file" />
-  <property name="ivy.artifact.group"
-            value="pentaho"
-            description="IVY metadata describing the originating company or organization" />
-
   <!-- SVN Ant Properties -->
   <property name="svnant.url"
             value="http://subclipse.tigris.org/files/documents/906/43359/svnant-1.2.0-RC1.zip"
@@ -190,6 +178,27 @@
             value="${basedir}/res"
             description="Directory that holds resources not included in the source tree" />
 
+  <!-- Ivy properties -->
+  <property name="ivy.install.version" value="2.0.0-beta2" description="Specifies the version of IVY to fetch" />
+  <property name="ivy.jar.file"
+            value="${ivy.build.cache.dir}/ivybeta1.jar"
+            description="The full path to the IVY jar file to use during the build.  If the file is not present, the build will attempt to fetch IVY and save the jar as specified by this property" />
+  <property name="ivy.settingsurl"
+            value="file:${basedir}/ivysettings.xml"
+            description="URL to the (common) ivysettings.xml.  This file is required by the build to configure IVY.  Note you must escape the ':' if this property exists in a .properties file" />
+  <property name="ivy.artifact.group"
+            value="pentaho"
+            description="IVY metadata describing the originating company or organization" />
+  <property name="ivy.artifact.pomfile"
+            value="${dist.dir}/pom.xml"
+            description="The path to the Maven pom file to deploy with the artifact" />
+  <property name="ivy.artifact.ivyfilename"
+            value="ivy.xml"
+            description="The name of the IVY xml file to deploy with the artifact" />
+  <property name="ivy.artifact.ivypathname"
+            value="${dist.dir}/ivy.xml"
+            description="The full path to the IVY xml file to deploy with the artifact" />
+
   <!-- Set the os property -->
   <condition property="isLinux">
     <os family="unix" />
@@ -200,6 +209,17 @@
   <condition property="isMac">
     <os family="mac" />
   </condition>
+
+  <condition property="os.classifier" value="win">
+    <os family="windows" />
+  </condition>
+  <condition property="os.classifier" value="mac">
+    <os family="mac" />
+  </condition>
+  <condition property="os.classifier" value="linux">
+    <os family="unix" />
+  </condition>
+  <property name="os.classifier" value="unsupported" />
 
   <!-- Setup the compile classpath -->
   <path id="classpath">
@@ -331,8 +351,8 @@
   <target name="svnant.download" unless="svnant.available">
     <mkdir dir="${svnant.build.cache.dir}" />
     <get src="${svnant.url}" dest="${svnant.build.cache.dir}/svnant.zip" usetimestamp="true" />
-    <unzip src="${svnant.build.cache.dir}/svnant.zip" dest="${svnant.build.cache.dir}" >
-          <patternset>
+    <unzip src="${svnant.build.cache.dir}/svnant.zip" dest="${svnant.build.cache.dir}">
+      <patternset>
         <include name="**/*.jar" />
       </patternset>
     </unzip>
@@ -475,6 +495,16 @@
     <ivy:retrieve conf="test" pattern="${testlib.dir}/[module]-[revision].[ext]" />
   </target>
 
+  <target name="resolve-codegen" depends="resolve-init">
+    <ivy:resolve file="ivy.xml" conf="codegen" />
+    <ivy:retrieve conf="codegen" pattern="${lib.dir}/[module]-[revision].[ext]" />
+  </target>
+
+  <target name="resolve-runtime" depends="resolve-init">
+    <ivy:resolve file="ivy.xml" conf="runtime" />
+    <ivy:retrieve conf="runtime" pattern="${lib.dir}/[module]-[revision].[ext]" />
+  </target>
+
 
   <!--=======================================================================
 	    ivy-clean-cache
@@ -520,7 +550,7 @@
 	    system.
 	    ====================================================================-->
   <target name="publish-local-nojar" depends="install-ivy" description="Publishes the jar file to the local repository">
-    <ivy:resolve file="ivy.xml" />
+    <ivy:resolve file="${ivy.artifact.ivyfilename}" />
     <ivy:publish resolver="local" pubrevision="${project.revision}" overwrite="true" forcedeliver="true">
       <artifacts pattern="${dist.dir}/[artifact]-[revision].[ext]" />
     </ivy:publish>
@@ -535,7 +565,7 @@
 	    executed on the user's system.
 	    ====================================================================-->
   <target name="publish-local"
-          depends="jar, publish-local-nojar"
+          depends="dist, publish-local-nojar"
           description="Builds and publishes the jar file to the local repository" />
 
 
@@ -546,7 +576,7 @@
         repository. 
         ====================================================================-->
   <target name="publish-pentaho"
-          depends="jar, publish-pentaho-nojar"
+          depends="dist, publish-pentaho-nojar"
           description="Builds and publishes the jar file to a Maven2 repository" />
 
 
@@ -590,7 +620,7 @@
             <arg value="-DartifactId=${ivy.artifact.id}" />
             <arg value="-Dversion=${project.revision}" />
             <arg value="-Dpackaging=ivy.xml" />
-            <arg value="-Dfile=${dist.dir}/ivy.xml" />
+            <arg value="-Dfile=${ivy.artifact.ivypathname}" />
           </exec>
           <!-- second, publish the jar file -->
           <exec executable="cmd">
@@ -599,7 +629,7 @@
             <arg value="deploy:deploy-file" />
             <arg value="-DrepositoryId=${ivy.repository.id}" />
             <arg value="-Durl=${ivy.repository.publish}" />
-            <arg value="-DpomFile=${dist.dir}/pom.xml" />
+            <arg value="-DpomFile=${ivy.artifact.pomfile}" />
             <arg value="-Dfile=${dist.dir}/${ivy.artifact.id}-${project.revision}.jar" />
           </exec>
         </then>
@@ -613,14 +643,14 @@
             <arg value="-DartifactId=${ivy.artifact.id}" />
             <arg value="-Dversion=${project.revision}" />
             <arg value="-Dpackaging=ivy.xml" />
-            <arg value="-Dfile=${dist.dir}/ivy.xml" />
+            <arg value="-Dfile=${ivy.artifact.ivypathname}" />
           </exec>
           <!-- second, publish the jar file -->
           <exec executable="mvn">
             <arg value="deploy:deploy-file" />
             <arg value="-DrepositoryId=${ivy.repository.id}" />
             <arg value="-Durl=${ivy.repository.publish}" />
-            <arg value="-DpomFile=${dist.dir}/pom.xml" />
+            <arg value="-DpomFile=${ivy.artifact.pomfile}" />
             <arg value="-Dfile=${dist.dir}/${ivy.artifact.id}-${project.revision}.jar" />
           </exec>
         </else>
@@ -846,7 +876,7 @@
     <jar destfile="${dist.dir}/${ivy.artifact.id}-${project.revision}.jar">
       <manifest>
         <attribute name="Implementation-Title" value="${impl.title}" />
-        <attribute name="Implementation-Version" value="${project.revision}-b${svn.revision}" />
+        <attribute name="Implementation-Version" value="${project.revision}.${svn.revision}" />
         <attribute name="Implementation-Vendor" value="${impl.vendor}" />
         <attribute name="Implementation-ProductID" value="${impl.productID}" />
       </manifest>
