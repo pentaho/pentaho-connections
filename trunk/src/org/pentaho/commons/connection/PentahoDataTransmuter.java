@@ -202,7 +202,7 @@ public class PentahoDataTransmuter extends DataUtilities {
     columnHeaders = DataUtilities.filterDataByColumns(columnHeaders, columnsToInclude);
     // create a 2D array of the data
     source.beforeFirst(); // make sure we start at the beginning
-    List dataList = new ArrayList();
+    List<Object[]> dataList = new ArrayList<Object[]>();
     Object[] rowData = source.next();
     while (rowData != null) {
       dataList.add(rowData);
@@ -212,7 +212,7 @@ public class PentahoDataTransmuter extends DataUtilities {
     if (columnHeaders != null) {
       data = new Object[dataList.size()][columnHeaders[0].length];
       for (int row = 0; row < data.length; row++) {
-        data[row] = (Object[]) dataList.get(row);
+        data[row] = dataList.get(row);
       }
     }
     // now filter the data
@@ -306,7 +306,7 @@ public class PentahoDataTransmuter extends DataUtilities {
    * @return an array of Integers that represes the selected rows
    */
   public static Integer[] rowNamesToIndexes(IPentahoResultSet source, String[][] names) {
-    List result = new ArrayList();
+    List<Integer> result = new ArrayList<Integer>();
     for (int row = 0; row < names.length; row++) {
       int found = source.getMetaData().getRowIndex(names[row]);
       if (found != -1) {
@@ -315,7 +315,7 @@ public class PentahoDataTransmuter extends DataUtilities {
     }
     Integer[] resultArray = new Integer[result.size()];
     for (int i = 0; i < resultArray.length; i++) {
-      resultArray[i] = (Integer) result.get(i);
+      resultArray[i] = result.get(i);
     }
     return resultArray;
   }
@@ -335,7 +335,7 @@ public class PentahoDataTransmuter extends DataUtilities {
    * @return an array of Integers that represents the selected columns
    */
   public static Integer[] columnNamesToIndexes(IPentahoResultSet source, String[][] names) {
-    List result = new ArrayList();
+    List<Integer> result = new ArrayList<Integer>();
     for (int row = 0; row < names.length; row++) {
       int found = source.getMetaData().getColumnIndex(names[row]);
       if (found != -1) {
@@ -344,7 +344,7 @@ public class PentahoDataTransmuter extends DataUtilities {
     }
     Integer[] resultArray = new Integer[result.size()];
     for (int i = 0; i < resultArray.length; i++) {
-      resultArray[i] = (Integer) result.get(i);
+      resultArray[i] = result.get(i);
     }
     return resultArray;
   }
@@ -568,7 +568,7 @@ public class PentahoDataTransmuter extends DataUtilities {
       int colCount = memoryResultSet.getColumnCount();
       Object squashColumnValue = memoryResultSet.getValueAt(0, squashColumn);
       Object squashedRow[] = new Object[colCount];
-      List rowsList = new LinkedList();
+      List<Object[]> rowsList = new LinkedList<Object[]>();
       rowsList.add(squashedRow);
       for (int row = 0; row < rowCount; row++) {
         Object newSquashColumnValue = memoryResultSet.getValueAt(row, squashColumn);
@@ -591,7 +591,7 @@ public class PentahoDataTransmuter extends DataUtilities {
       }
       Object rows[][] = new Object[rowsList.size()][colCount];
       for (int i = 0; i < rowsList.size(); i++) {
-        rows[i] = (Object[]) rowsList.get(i);
+        rows[i] = rowsList.get(i);
       }
       return MemoryResultSet.createFromArrays(colHeads, rows);
     }
@@ -781,6 +781,7 @@ public class PentahoDataTransmuter extends DataUtilities {
    * 
    * 
    */
+  @SuppressWarnings({"unchecked"})
   public static IPentahoResultSet crossTab(IPentahoResultSet source, int columnToPivot, int measureColumn,
       int columnToSortColumnsBy, Format pivotDataFormatter, Format sortDataFormatter, boolean orderedMaps) {
 
@@ -806,7 +807,7 @@ public class PentahoDataTransmuter extends DataUtilities {
     }
     // Now, setup so variables and such
     final String sortPrefixSeparator = "\t"; //$NON-NLS-1$
-    Map rowMap = null, newHeadersMap = null;
+    Map<Object,Object> rowMap = null, newHeadersMap = null;
 
     // Force orderedMaps to true if we're sorting using a column in the
     // input.
@@ -817,15 +818,15 @@ public class PentahoDataTransmuter extends DataUtilities {
 
     if (orderedMaps) {
       // If we're using ordered maps, then our maps become TreeMaps.
-      rowMap = new TreeMap(); // Map of the current row
-      newHeadersMap = new TreeMap(); // New header columns map
+      rowMap = new TreeMap<Object,Object>(); // Map of the current row
+      newHeadersMap = new TreeMap<Object,Object>(); // New header columns map
     } else {
       // Use Apache ListOrderedMap so that columns become ordered by their
       // position in the data.
       rowMap = ListOrderedMap.decorate(new HashMap());
       newHeadersMap = ListOrderedMap.decorate(new HashMap());
     }
-    List columnHeaders = new ArrayList(); // All column headers
+    List<String> columnHeaders = new ArrayList<String>(); // All column headers
     // Create column headers of the known columns
     IPentahoMetaData origMetaData = source.getMetaData();
     Object[][] origColHeaders = origMetaData.getColumnHeaders();
@@ -839,7 +840,7 @@ public class PentahoDataTransmuter extends DataUtilities {
     Object colPivotData, colMeasureData, cellData, colToSortByRaw;
     Object[] rowData = source.next();
     String columnPrefix = null;
-    Map currentMap = null;
+    Map<Object,Object> currentMap = null;
     while (rowData != null) {
       colPivotData = rowData[columnToPivot]; // The data we're pivoting to columns
       if (colPivotData == null) {
@@ -937,7 +938,7 @@ public class PentahoDataTransmuter extends DataUtilities {
       String aHeader;
       int tabIdx;
       for (int i = 0; i < columnHeaders.size(); i++) {
-        aHeader = (String) columnHeaders.get(i);
+        aHeader = columnHeaders.get(i);
         tabIdx = aHeader.indexOf(sortPrefixSeparator);
         if (tabIdx >= 0) {
           columnHeaders.set(i, aHeader.substring(tabIdx + 1));
@@ -951,6 +952,7 @@ public class PentahoDataTransmuter extends DataUtilities {
     return result;
   }
 
+  @SuppressWarnings({"unchecked"})
   private static List recurseCreateRow(Object lookup, Map mapToLookupIn, List rows, List curRow, Map newColumnsMap) {
     // Recursive method used to create each row.
     if (curRow == null) {
@@ -1170,6 +1172,7 @@ public class PentahoDataTransmuter extends DataUtilities {
     return crossTabOrdered(source, columnToPivot, measureColumn, -1, pivotDataFormatter, null, orderedMaps, -1);
   }
 
+  @SuppressWarnings({"unchecked"})
   public static IPentahoResultSet crossTabOrdered(IPentahoResultSet source, int columnToPivot, int measureColumn,
       int columnToSortColumnsBy, Format pivotDataFormatter, Format sortDataFormatter, boolean orderedMaps,
       int uniqueRowIdentifierColumn) {
@@ -1368,6 +1371,7 @@ public class PentahoDataTransmuter extends DataUtilities {
     return mrs;
   }
 
+  @SuppressWarnings({"unchecked"})
   private static void addIfNeeded(Object[] currentRow, MemoryResultSet mrs, Map uniqueColumnIdentifierMap,
       int uniqueRowIdentifierColumnPostShift) {
     if (uniqueRowIdentifierColumnPostShift >= 0) {

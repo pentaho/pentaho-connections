@@ -33,13 +33,13 @@ public interface IPentahoConnection {
 
   public static final int NONE_DATASOURCE = -1;
 
-  public static final String SQL_DATASOURCE = "SQL";
+  public static final String SQL_DATASOURCE = "SQL"; //$NON-NLS-1$
 
-  public static final String MDX_DATASOURCE = "MDX";
+  public static final String MDX_DATASOURCE = "MDX"; //$NON-NLS-1$
 
-  public static final String XML_DATASOURCE = "XML";
+  public static final String XML_DATASOURCE = "XML"; //$NON-NLS-1$
 
-  public static final String HQL_DATASOURCE = "HQL";
+  public static final String HQL_DATASOURCE = "HQL"; //$NON-NLS-1$
 
   /**
    * Setting for class name used to look up a connection in the pentaho.xml.
