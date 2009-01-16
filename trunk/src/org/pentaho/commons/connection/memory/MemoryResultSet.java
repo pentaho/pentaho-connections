@@ -21,31 +21,35 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.dom4j.Node;
+import org.pentaho.commons.connection.IPeekable;
 import org.pentaho.commons.connection.IPentahoMetaData;
 import org.pentaho.commons.connection.IPentahoResultSet;
 
-public class MemoryResultSet implements IPentahoResultSet {
+public class MemoryResultSet implements IPentahoResultSet, IPeekable {
 
   private IPentahoMetaData metaData;
 
-  protected List rows;
+  protected List<Object[]> rows;
 
   protected Iterator iterator = null;
 
+  protected Object peekRow[];
+
   public MemoryResultSet() {
-    rows = new ArrayList();
+    rows = new ArrayList<Object[]>();
   }
 
   public MemoryResultSet(IPentahoMetaData metaData) {
     this.metaData = metaData;
-    rows = new ArrayList();
+    rows = new ArrayList<Object[]>();
   }
 
   public void setMetaData(IPentahoMetaData metaData) {
     this.metaData = metaData;
-    rows = new ArrayList();
+    rows = new ArrayList<Object[]>();
   }
 
+  @SuppressWarnings({"unchecked"})
   public void setRows(List rows) {
     this.rows = rows;
   }
@@ -59,7 +63,20 @@ public class MemoryResultSet implements IPentahoResultSet {
     return metaData;
   }
 
+  public Object[] peek() {
+
+    if( peekRow == null ) {
+      peekRow = next();
+    }
+    return peekRow;
+  }
+  
   public Object[] next() {
+    if (peekRow != null) {
+      Object row[] = peekRow;
+      peekRow = null;
+      return row;
+    }
     if (iterator == null) {
       iterator = rows.iterator();
     }
@@ -192,7 +209,7 @@ public class MemoryResultSet implements IPentahoResultSet {
    * @return the value.
    */
   public Object getValueAt(int row, int column) {
-    Object[] theRow = (Object[]) rows.get(row);
+    Object[] theRow = rows.get(row);
     return theRow[column];
   }
 
@@ -238,6 +255,6 @@ public class MemoryResultSet implements IPentahoResultSet {
     if (row >= rows.size()) {
       return null;
     }
-    return (Object[]) rows.get(row);
+    return rows.get(row);
   }
 }
