@@ -40,7 +40,9 @@ public interface IPentahoMetaData {
    * NOTE: 2D data will return null for the row header. Multidimensional data
    * will return N x M where M is the number of dimensions and N is the number
    * of rows. With the 0 index for M representing the innermost dimension.
+   * This method has been moved to IMultiDimensionalMetaData
    */
+  @Deprecated
   public Object[][] getRowHeaders();
 
   /**

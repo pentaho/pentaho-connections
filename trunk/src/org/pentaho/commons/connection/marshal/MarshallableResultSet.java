@@ -39,6 +39,10 @@ public class MarshallableResultSet implements Serializable {
 	
 	private MarshallableColumnNames columnNames;
 	
+  private int numColumnHeaderSets = 0;
+  
+  private int numRowHeaderSets = 0;
+  
 	public MarshallableResultSet() {
 	}
 	
@@ -119,5 +123,21 @@ public class MarshallableResultSet implements Serializable {
 	public MarshallableColumnTypes getColumnTypes() {
 		return columnTypes;
 	}
+
+  public int getNumColumnHeaderSets() {
+    return numColumnHeaderSets;
+  }
+
+  public void setNumColumnHeaderSets(int numColumnHeaderSets) {
+    this.numColumnHeaderSets = numColumnHeaderSets;
+  }
+
+  public int getNumRowHeaderSets() {
+    return numRowHeaderSets;
+  }
+
+  public void setNumRowHeaderSets(int numRowHeaderSets) {
+    this.numRowHeaderSets = numRowHeaderSets;
+  }
 
 }
