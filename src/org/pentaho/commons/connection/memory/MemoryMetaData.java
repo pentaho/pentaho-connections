@@ -19,14 +19,23 @@ package org.pentaho.commons.connection.memory;
 import java.util.List;
 
 import org.pentaho.commons.connection.AbstractPentahoMetaData;
+import org.pentaho.commons.connection.IMultiDimensionalMetaData;
+import org.pentaho.commons.connection.MetaDataUtil;
 
-public class MemoryMetaData extends AbstractPentahoMetaData {
+public class MemoryMetaData extends AbstractPentahoMetaData implements IMultiDimensionalMetaData {
 
   String[] columnTypes;
 
   protected Object[][] columnHeaders;
 
   protected Object[][] rowHeaders;
+  
+  protected String[] columnNames; // row header names and collapsed version of the column headers
+  
+  protected String[] rowHeaderNames; // names of the row header columns
+  
+  protected String columnNameFormatStr; // format mask to use to generate the columnNames
+
 
   public MemoryMetaData(Object[][] columnHeaders, Object[][] rowHeaders) {
     this.columnHeaders = columnHeaders;
@@ -68,4 +77,34 @@ public class MemoryMetaData extends AbstractPentahoMetaData {
     return rowHeaders;
   }
 
+  public void setRowHeaders( Object[][] rowHeaders ) {
+    this.rowHeaders = rowHeaders;
+  }
+
+  public String[] getFlattenedColumnNames() {
+    if( columnNames == null ) {
+      generateColumnNames();
+    }
+    return columnNames;
+  }
+
+  public void setFlattenedColumnNames(String[] columnNames) {
+    this.columnNames = columnNames;
+  }
+
+  public void setRowHeaderNames(String[] rowHeaderNames) {
+    this.rowHeaderNames = rowHeaderNames;
+  }
+  
+  public String[] getRowHeaderNames() {
+    return rowHeaderNames;
+  }
+
+  public void setColumnNameFormat( String formatStr ) {
+    this.columnNameFormatStr = formatStr;
+  }
+  
+  public void generateColumnNames() {
+    columnNames = MetaDataUtil.generateColumnNames(columnHeaders, rowHeaders, rowHeaderNames, columnNameFormatStr);
+  }
 }

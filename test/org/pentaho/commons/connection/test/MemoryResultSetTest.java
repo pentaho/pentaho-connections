@@ -1,3 +1,18 @@
+/*
+ * Copyright 2009 Pentaho Corporation.  All rights reserved. 
+ * This software was developed by Pentaho Corporation and is provided under the terms 
+ * of the Mozilla Public License, Version 1.1, or any later version. You may not use 
+ * this file except in compliance with the license. If you need a copy of the license, 
+ * please go to http://www.mozilla.org/MPL/MPL-1.1.txt. The Original Code is the Pentaho 
+ * BI Platform.  The Initial Developer is Pentaho Corporation.
+ *
+ * Software distributed under the Mozilla Public License is distributed on an "AS IS" 
+ * basis, WITHOUT WARRANTY OF ANY KIND, either express or  implied. Please refer to 
+ * the license for the specific language governing your rights and limitations.
+ *
+ * Created Jan, 2009 
+ * @author jdixon
+ */
 package org.pentaho.commons.connection.test;
 
 import java.util.ArrayList;
@@ -331,6 +346,321 @@ public class MemoryResultSetTest extends TestCase {
 
   }
   
+  public void testPeekFlattened1() {
+
+    MemoryMetaData metadata = new MemoryMetaData( 
+        new String[][] { { "col1", "col2" } }, 
+        new String[][] { {"2009", "item1"}, {"2009", "item2"}, {"2008", "item1"}  }
+        );
+
+    MemoryResultSet data = new MemoryResultSet( metadata );
+    
+    data.addRow( new Object[] {"a", new Integer(1) } );
+    data.addRow( new Object[] {"b", new Integer(2) } );
+    data.addRow( new Object[] {"c", new Integer(3) } );
+
+    Object row[] = data.peekFlattened();
+    assertEquals( "2009", row[0] );
+    assertEquals( "item1", row[1] );
+    assertEquals( "a", row[2] );
+    assertEquals( 1, row[3] );
+
+    row = data.peekFlattened( );
+    assertEquals( "2009", row[0] );
+    assertEquals( "item1", row[1] );
+    assertEquals( "a", row[2] );
+    assertEquals( 1, row[3] );
+
+    row = data.peekFlattened( );
+    assertEquals( "2009", row[0] );
+    assertEquals( "item1", row[1] );
+    assertEquals( "a", row[2] );
+    assertEquals( 1, row[3] );
+
+    row = data.nextFlattened();
+    assertEquals( "2009", row[0] );
+    assertEquals( "item1", row[1] );
+    assertEquals( "a", row[2] );
+    assertEquals( 1, row[3] );
+
+    row = data.peekFlattened( );
+    assertEquals( "2009", row[0] );
+    assertEquals( "item2", row[1] );
+    assertEquals( "b", row[2] );
+    assertEquals( 2, row[3] );
+
+    row = data.peekFlattened( );
+    assertEquals( "2009", row[0] );
+    assertEquals( "item2", row[1] );
+    assertEquals( "b", row[2] );
+    assertEquals( 2, row[3] );
+
+    row = data.nextFlattened();
+    assertEquals( "2009", row[0] );
+    assertEquals( "item2", row[1] );
+    assertEquals( "b", row[2] );
+    assertEquals( 2, row[3] );
+
+    row = data.peekFlattened( );
+    assertEquals( "2008", row[0] );
+    assertEquals( "item1", row[1] );
+    assertEquals( "c", row[2] );
+    assertEquals( 3, row[3] );
+
+    row = data.peekFlattened( );
+    assertEquals( "2008", row[0] );
+    assertEquals( "item1", row[1] );
+    assertEquals( "c", row[2] );
+    assertEquals( 3, row[3] );
+
+    row = data.nextFlattened( );
+    assertEquals( "2008", row[0] );
+    assertEquals( "item1", row[1] );
+    assertEquals( "c", row[2] );
+    assertEquals( 3, row[3] );
+
+    row = data.peekFlattened( );
+    assertNull( row );
+    
+    row = data.peekFlattened( );
+    assertNull( row );
+    
+    row = data.peekFlattened( );
+    assertNull( row );
+    
+    row = data.nextFlattened( );
+    assertNull( row );
+
+    data.beforeFirst();
+    row = data.peekFlattened( );
+    assertEquals( "2009", row[0] );
+    assertEquals( "item1", row[1] );
+    assertEquals( "a", row[2] );
+    assertEquals( 1, row[3] );
+
+  }
+  
+  public void testPeekFlattened2() {
+
+    // test that the flattened next() and peek() work like the regular ones
+    // if there are no row headers
+    MemoryMetaData metadata = new MemoryMetaData( new String[][] { { "col1", "col2" } }, null );
+
+    MemoryResultSet data = new MemoryResultSet( metadata );
+    
+    data.addRow( new Object[] {"a", new Integer(1) } );
+    data.addRow( new Object[] {"b", new Integer(2) } );
+    data.addRow( new Object[] {"c", new Integer(3) } );
+
+    Object row[] = data.peekFlattened( );
+    assertEquals( "a", row[0] );
+    assertEquals( 1, row[1] );
+
+    row = data.peekFlattened( );
+    assertEquals( "a", row[0] );
+    assertEquals( 1, row[1] );
+
+    row = data.peekFlattened( );
+    assertEquals( "a", row[0] );
+    assertEquals( 1, row[1] );
+
+    row = data.nextFlattened();
+    assertEquals( "a", row[0] );
+    assertEquals( 1, row[1] );
+
+    row = data.peekFlattened( );
+    assertEquals( "b", row[0] );
+    assertEquals( 2, row[1] );
+
+    row = data.peekFlattened( );
+    assertEquals( "b", row[0] );
+    assertEquals( 2, row[1] );
+
+    row = data.nextFlattened();
+    assertEquals( "b", row[0] );
+    assertEquals( 2, row[1] );
+
+    row = data.peekFlattened( );
+    assertEquals( "c", row[0] );
+    assertEquals( 3, row[1] );
+
+    row = data.peekFlattened( );
+    assertEquals( "c", row[0] );
+    assertEquals( 3, row[1] );
+
+    row = data.nextFlattened( );
+    assertEquals( "c", row[0] );
+    assertEquals( 3, row[1] );
+
+    row = data.peekFlattened( );
+    assertNull( row );
+    
+    row = data.peekFlattened( );
+    assertNull( row );
+    
+    row = data.peekFlattened( );
+    assertNull( row );
+    
+    row = data.nextFlattened( );
+    assertNull( row );
+
+    data.beforeFirst();
+    row = data.peekFlattened( );
+    assertEquals( "a", row[0] );
+    assertEquals( 1, row[1] );
+
+  }
+
+  public void testPeekFlattened3() {
+
+    // test what happens when there are fewer row headers than rows
+    MemoryMetaData metadata = new MemoryMetaData( 
+        new String[][] { { "col1", "col2" } }, 
+        new String[][] { {"2009", "item1"}, {"2009", "item2"} }
+        );
+
+    MemoryResultSet data = new MemoryResultSet( metadata );
+    
+    data.addRow( new Object[] {"a", new Integer(1) } );
+    data.addRow( new Object[] {"b", new Integer(2) } );
+    data.addRow( new Object[] {"c", new Integer(3) } );
+
+    Object row[] = data.peekFlattened();
+    assertEquals( "2009", row[0] );
+    assertEquals( "item1", row[1] );
+    assertEquals( "a", row[2] );
+    assertEquals( 1, row[3] );
+
+    row = data.peekFlattened( );
+    assertEquals( "2009", row[0] );
+    assertEquals( "item1", row[1] );
+    assertEquals( "a", row[2] );
+    assertEquals( 1, row[3] );
+
+    row = data.peekFlattened( );
+    assertEquals( "2009", row[0] );
+    assertEquals( "item1", row[1] );
+    assertEquals( "a", row[2] );
+    assertEquals( 1, row[3] );
+
+    row = data.nextFlattened();
+    assertEquals( "2009", row[0] );
+    assertEquals( "item1", row[1] );
+    assertEquals( "a", row[2] );
+    assertEquals( 1, row[3] );
+
+    row = data.peekFlattened( );
+    assertEquals( "2009", row[0] );
+    assertEquals( "item2", row[1] );
+    assertEquals( "b", row[2] );
+    assertEquals( 2, row[3] );
+
+    row = data.peekFlattened( );
+    assertEquals( "2009", row[0] );
+    assertEquals( "item2", row[1] );
+    assertEquals( "b", row[2] );
+    assertEquals( 2, row[3] );
+
+    row = data.nextFlattened();
+    assertEquals( "2009", row[0] );
+    assertEquals( "item2", row[1] );
+    assertEquals( "b", row[2] );
+    assertEquals( 2, row[3] );
+
+    row = data.peekFlattened( );
+    assertEquals( "c", row[0] );
+    assertEquals( 3, row[1] );
+
+    row = data.peekFlattened( );
+    assertEquals( "c", row[0] );
+    assertEquals( 3, row[1] );
+
+    row = data.nextFlattened( );
+    assertEquals( "c", row[0] );
+    assertEquals( 3, row[1] );
+
+    row = data.peekFlattened( );
+    assertNull( row );
+    
+    row = data.peekFlattened( );
+    assertNull( row );
+    
+    row = data.peekFlattened( );
+    assertNull( row );
+    
+    row = data.nextFlattened( );
+    assertNull( row );
+
+    data.beforeFirst();
+    row = data.peekFlattened( );
+    assertEquals( "2009", row[0] );
+    assertEquals( "item1", row[1] );
+    assertEquals( "a", row[2] );
+    assertEquals( 1, row[3] );
+
+  }
+  
+
+  public void testColumnNames1() {
+
+    MemoryMetaData metadata = new MemoryMetaData( 
+        new String[][] { { "col1", "col2" } }, 
+        new String[][] { {"2009", "item1"}, {"2009", "item2"}, {"2008", "item1"},  }
+        );
+
+    MemoryResultSet data = new MemoryResultSet( metadata );
+
+    metadata.setRowHeaderNames( new String[] { "Year", "Item" } );
+    
+    metadata.generateColumnNames();
+
+    String tmp[] = metadata.getRowHeaderNames();
+    assertEquals( "Year", tmp[0] );
+    assertEquals( "Item", tmp[1] );
+    
+    String columnNames[] = metadata.getFlattenedColumnNames();
+    
+    assertEquals("wrong number of column names", 4, columnNames.length);
+    assertEquals("wrong column name", "Year", columnNames[0]);
+    assertEquals("wrong column name", "Item", columnNames[1]);
+    assertEquals("wrong column name", "col1", columnNames[2]);
+    assertEquals("wrong column name", "col2", columnNames[3]);
+    
+  }
+
+  public void testColumnNames2() {
+
+    MemoryMetaData metadata = new MemoryMetaData( 
+        new String[][] { { "col1", "col2" }, { "subcol1", "subcol2" } }, 
+        new String[][] { {"2009", "item1"}, {"2009", "item2"}, {"2008", "item1"},  }
+        );
+
+    MemoryResultSet data = new MemoryResultSet( metadata );
+
+    metadata.setRowHeaderNames( new String[] { "Year", "Item" } );
+    metadata.setColumnNameFormat( "{0}::{1}" );
+    metadata.generateColumnNames();
+
+    String columnNames[] = metadata.getFlattenedColumnNames();
+    
+    assertEquals("wrong number of column names", 4, columnNames.length);
+    assertEquals("wrong column name", "Year", columnNames[0]);
+    assertEquals("wrong column name", "Item", columnNames[1]);
+    assertEquals("wrong column name", "col1::subcol1", columnNames[2]);
+    assertEquals("wrong column name", "col2::subcol2", columnNames[3]);
+
+    metadata.setFlattenedColumnNames( new String[] { "yr", "item", "c1", "c2" } );
+
+    columnNames = metadata.getFlattenedColumnNames();
+    
+    assertEquals("wrong number of column names", 4, columnNames.length);
+    assertEquals("wrong column name", "yr", columnNames[0]);
+    assertEquals("wrong column name", "item", columnNames[1]);
+    assertEquals("wrong column name", "c1", columnNames[2]);
+    assertEquals("wrong column name", "c2", columnNames[3]);
+
+  }
+    
   public void testCreateList() {
   
     List items = new ArrayList();
