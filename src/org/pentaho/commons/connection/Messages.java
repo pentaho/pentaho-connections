@@ -33,12 +33,12 @@ public class Messages {
     }
   }
   
-  public static String getString(String key, String param1) {
-    try {
-      Object[] args = {param1};
-      return MessageFormat.format(key, args);      
-    } catch (Exception e) {
-      return '!' + key + '!';
-    }
-  }
+  public static String getString(final String key, final String... params) {
+	    try {
+	        return MessageFormat.format(RESOURCE_BUNDLE.getString(key), (Object[])params);
+	      } catch (Exception e) {
+	        return '!' + key + '!';
+	      }
+ }
+  
 }
