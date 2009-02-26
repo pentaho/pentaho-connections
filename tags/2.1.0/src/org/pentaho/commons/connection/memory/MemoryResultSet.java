@@ -21,12 +21,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.dom4j.Node;
-import org.pentaho.commons.connection.IMultiDimensionalResultSet;
 import org.pentaho.commons.connection.IPeekable;
 import org.pentaho.commons.connection.IPentahoMetaData;
 import org.pentaho.commons.connection.IPentahoResultSet;
 
-public class MemoryResultSet implements IPentahoResultSet, IPeekable, IMultiDimensionalResultSet {
+public class MemoryResultSet implements IPentahoResultSet, IPeekable {
 
   private IPentahoMetaData metaData;
 
@@ -35,8 +34,6 @@ public class MemoryResultSet implements IPentahoResultSet, IPeekable, IMultiDime
   protected Iterator iterator = null;
 
   protected Object peekRow[];
-  
-  protected int rowIndex = 0;
 
   public MemoryResultSet() {
     rows = new ArrayList<Object[]>();
@@ -55,7 +52,6 @@ public class MemoryResultSet implements IPentahoResultSet, IPeekable, IMultiDime
   @SuppressWarnings({"unchecked"})
   public void setRows(List rows) {
     this.rows = rows;
-    rowIndex = 0;
   }
 
   public int addRow(Object[] row) {
@@ -85,7 +81,6 @@ public class MemoryResultSet implements IPentahoResultSet, IPeekable, IMultiDime
       iterator = rows.iterator();
     }
     if (iterator.hasNext()) {
-      rowIndex++;
       return (Object[]) iterator.next();
     } else {
       return null;
@@ -95,7 +90,6 @@ public class MemoryResultSet implements IPentahoResultSet, IPeekable, IMultiDime
   public void close() {
     // dispose of the iterator so the rows can be iterated again
     iterator = null;
-    rowIndex = 0;
   }
 
   public void closeConnection() {
@@ -244,16 +238,15 @@ public class MemoryResultSet implements IPentahoResultSet, IPeekable, IMultiDime
 
   public void beforeFirst() {
     iterator = rows.iterator();
-    rowIndex = 0;
   }
 
   public Object[] getDataColumn(int column) {
     Object[] result = new Object[getRowCount()];
-    int index = 0;
+    int rowIndex = 0;
     Iterator iter = rows.iterator();
     while (iter.hasNext()) {
-      result[index] = ((Object[]) iter.next())[column];
-      index++;
+      result[rowIndex] = ((Object[]) iter.next())[column];
+      rowIndex++;
     }
     return result;
   }
@@ -263,57 +256,5 @@ public class MemoryResultSet implements IPentahoResultSet, IPeekable, IMultiDime
       return null;
     }
     return rows.get(row);
-  }
-
-  public Object[] nextFlattened() {
-    Object rowHeaders[][] = metaData.getRowHeaders();
-    if( rowHeaders == null ) {
-      // we have no row headers so we can call the regular next()
-      return next();
-    }
-    // get the row
-    Object row[] = next();
-    if( row == null ) {
-      // we have got to the end
-      return null;
-    }
-    // do we have row headers to return also?
-    if( rowIndex <= rowHeaders.length ) {
-      // pull out the right row headers
-      Object rowHeads[] = rowHeaders[rowIndex-1];
-      // create the flattened row
-      Object flatRow[] = new Object[rowHeads.length+row.length];
-      // copy in the row headers and row objects
-      System.arraycopy(rowHeads, 0, flatRow, 0, rowHeads.length);
-      System.arraycopy(row, 0, flatRow, rowHeads.length, row.length);
-      return flatRow;
-    }
-    return row;
-  }
-
-  public Object[] peekFlattened() {
-    Object rowHeaders[][] = metaData.getRowHeaders();
-    if( rowHeaders == null ) {
-      // we have no row headers so we can call the regular peek()
-      return peek();
-    }
-    // get the row
-    Object row[] = peek();
-    if( row == null ) {
-      // we have got to the end
-      return null;
-    }
-    // do we have row headers to return also?
-    if( rowIndex <= rowHeaders.length ) {
-      // pull out the right row headers
-      Object rowHeads[] = rowHeaders[rowIndex-1];
-      // create the flattened row
-      Object flatRow[] = new Object[rowHeads.length+row.length];
-      // copy in the row headers and row objects
-      System.arraycopy(rowHeads, 0, flatRow, 0, rowHeads.length);
-      System.arraycopy(row, 0, flatRow, rowHeads.length, row.length);
-      return flatRow;
-    }
-    return row;
   }
 }
