@@ -266,6 +266,7 @@ public class MemoryResultSet implements IPentahoResultSet, IPeekable, IMultiDime
   }
 
   public Object[] nextFlattened() {
+    @SuppressWarnings("deprecation")
     Object rowHeaders[][] = metaData.getRowHeaders();
     if( rowHeaders == null ) {
       // we have no row headers so we can call the regular next()
@@ -292,6 +293,7 @@ public class MemoryResultSet implements IPentahoResultSet, IPeekable, IMultiDime
   }
 
   public Object[] peekFlattened() {
+    @SuppressWarnings("deprecation")
     Object rowHeaders[][] = metaData.getRowHeaders();
     if( rowHeaders == null ) {
       // we have no row headers so we can call the regular peek()

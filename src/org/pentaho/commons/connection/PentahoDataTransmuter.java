@@ -393,6 +393,7 @@ public class PentahoDataTransmuter extends DataUtilities {
    *            column (column 0) will be used for row headers
    * @return 2D array representing the manufactured rowHeaders
    */
+  @SuppressWarnings("deprecation")
   protected static Object[][] constructRowHeaders(IPentahoResultSet source, Integer columnForRowHeaders) {
     Object[][] result = null;
     if (columnForRowHeaders == null) { // Nothing specified by user so
@@ -430,6 +431,7 @@ public class PentahoDataTransmuter extends DataUtilities {
    */
   protected static IPentahoMetaData swapAndPivotRowAndColumnHeaders(IPentahoMetaData metaData) {
     Object[][] sourceColumnHeaders = metaData.getColumnHeaders();
+    @SuppressWarnings("deprecation")
     Object[][] sourceRowHeaders = metaData.getRowHeaders();
     boolean hasColumnHeaders = sourceColumnHeaders != null;
     boolean hasRowHeaders = sourceRowHeaders != null;
@@ -450,6 +452,7 @@ public class PentahoDataTransmuter extends DataUtilities {
   }
 
   private static String[] getCollapsedRowHeaders(IPentahoResultSet resultSet, char seperator) {
+    @SuppressWarnings("deprecation")
     Object[][] rowHeaders = resultSet.getMetaData().getRowHeaders();
     if (rowHeaders != null) {
       StringBuffer[] resultBuffer = new StringBuffer[rowHeaders.length];
@@ -610,6 +613,7 @@ public class PentahoDataTransmuter extends DataUtilities {
     }
     source.beforeFirst();
     Object[][] columnHeaders = source.getMetaData().getColumnHeaders();
+    @SuppressWarnings("deprecation")
     Object[][] rowHeaders = source.getMetaData().getRowHeaders();
     String formatString = ""; //$NON-NLS-1$
     if (rowHeaders != null) {
