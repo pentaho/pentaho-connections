@@ -16,6 +16,8 @@
 package org.pentaho.commons.connection.marshal;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.pentaho.commons.connection.IPentahoDataTypes;
 import org.pentaho.commons.connection.IPentahoMetaData;
@@ -53,7 +55,6 @@ public class MarshallableResultSet implements Serializable {
 	public void setResultSet( IPentahoResultSet results ) {
 
 		int colCount = results.getColumnCount();
-		int rowCount = results.getRowCount();
 
 		// create the metadata
 		IPentahoMetaData metadata = results.getMetaData();
@@ -69,24 +70,28 @@ public class MarshallableResultSet implements Serializable {
     columnTypes = new MarshallableColumnTypes( );
 
 		// create the 2D array of data
-		rows = new MarshallableRow[ rowCount ];
+		List<MarshallableRow> rowList = new ArrayList<MarshallableRow>();
 		
 		int unknownTypes = colCount;
     String tmpTypes[] = new String[ colCount ];
-		for( int rowNo=0; rowNo<rowCount; rowNo++ ) {
-			Object row[] = results.getDataRow( rowNo );
-			rows[rowNo] = new MarshallableRow(  );
-			rows[rowNo].setCell(row);
+    Object[] rowObjects = results.next();
+    while (rowObjects != null) {
+      MarshallableRow row = new MarshallableRow();
+      row.setCell(rowObjects);
+      rowList.add(row);
 			// see if we can resolve any unknown types using the data on this row
 			if( unknownTypes > 0 ) {
-	      for( int colNo=0; colNo<row.length; colNo++ ) {
-	        if(tmpTypes[colNo] == null && row[colNo] != null) {
-	          tmpTypes[colNo] = MarshallableColumnTypes.getDataType( row[colNo].getClass().getName() );
+        for( int colNo=0; colNo<rowObjects.length; colNo++ ) {
+          if(tmpTypes[colNo] == null && rowObjects[colNo] != null) {
+            tmpTypes[colNo] = MarshallableColumnTypes.getDataType( rowObjects[colNo].getClass().getName() );
 	          unknownTypes--;
 	        }
 	      }
 			}
+      rowObjects = results.next();
 		}
+    rows = new MarshallableRow[rowList.size()];
+    rowList.toArray(rows);
 		// pick string type for any column that had nulls in every row
 		if( unknownTypes > 0 ) {
       for( int colNo=0; colNo<tmpTypes.length; colNo++ ) {
