@@ -36,6 +36,8 @@ public interface IPentahoConnection {
   public static final String SQL_DATASOURCE = "SQL"; //$NON-NLS-1$
 
   public static final String MDX_DATASOURCE = "MDX"; //$NON-NLS-1$
+  
+  public static final String MDX_OLAP4J_DATASOURCE = "MDXOlap4j"; //$NON-NLS-1$
 
   public static final String XML_DATASOURCE = "XML"; //$NON-NLS-1$
 
