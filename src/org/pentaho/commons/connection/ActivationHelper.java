@@ -7,14 +7,16 @@ import java.io.OutputStream;
 import javax.activation.DataSource;
 
 public class ActivationHelper {
-  
+
   public static final class DatasourceWrapper implements IPentahoStreamSource {
     private DataSource dataSource;
-    public DatasourceWrapper(DataSource ds) {
+
+    public DatasourceWrapper( DataSource ds ) {
       super();
-      assert (ds != null);
+      assert ( ds != null );
       this.dataSource = ds;
     }
+
     public String getContentType() {
       return dataSource.getContentType();
     }
@@ -35,11 +37,12 @@ public class ActivationHelper {
   public static final class PentahoStreamSourceWrapper implements DataSource {
     private IPentahoStreamSource streamSource;
 
-    public PentahoStreamSourceWrapper(IPentahoStreamSource ss) {
+    public PentahoStreamSourceWrapper( IPentahoStreamSource ss ) {
       super();
       assert ss != null;
       this.streamSource = ss;
     }
+
     public String getContentType() {
       return streamSource.getContentType();
     }
@@ -56,6 +59,5 @@ public class ActivationHelper {
       return streamSource.getOutputStream();
     }
   }
-  
 
 }
