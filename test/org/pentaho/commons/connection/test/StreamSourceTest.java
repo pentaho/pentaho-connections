@@ -40,7 +40,7 @@ public class StreamSourceTest extends TestCase {
 
     InputStream in2 = source.getInputStream();
 
-    byte b[] = new byte[100];
+    byte[] b = new byte[100];
     int n = in2.read( b );
     assertEquals( 15, n );
     String content = new String( b, 0, n );
@@ -57,7 +57,7 @@ public class StreamSourceTest extends TestCase {
 
     out2.write( "test output data".getBytes() ); //$NON-NLS-1$
 
-    byte b[] = out1.toByteArray();
+    byte[] b = out1.toByteArray();
 
     String content = new String( b );
     assertEquals( "test output data", content ); //$NON-NLS-1$

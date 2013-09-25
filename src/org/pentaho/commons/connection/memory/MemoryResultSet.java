@@ -32,7 +32,7 @@ public class MemoryResultSet implements IPentahoResultSet, IPeekable, IMultiDime
 
   protected Iterator iterator = null;
 
-  protected Object peekRow[];
+  protected Object[] peekRow;
 
   protected int rowIndex = 0;
 
@@ -75,7 +75,7 @@ public class MemoryResultSet implements IPentahoResultSet, IPeekable, IMultiDime
 
   public Object[] next() {
     if ( peekRow != null ) {
-      Object row[] = peekRow;
+      Object[] row = peekRow;
       peekRow = null;
       return row;
     }
@@ -123,7 +123,7 @@ public class MemoryResultSet implements IPentahoResultSet, IPeekable, IMultiDime
    * @return MemoryResultSet
    */
   public static MemoryResultSet createFromLists( List colHeaders, List data ) {
-    Object columnHeaders[][] = new String[1][colHeaders.size()];
+    Object[][] columnHeaders = new String[1][colHeaders.size()];
     for ( int i = 0; i < colHeaders.size(); i++ ) {
       columnHeaders[0][i] = colHeaders.get( i );
     }
@@ -143,13 +143,13 @@ public class MemoryResultSet implements IPentahoResultSet, IPeekable, IMultiDime
    * @return MemoryResultSet
    */
   public static MemoryResultSet createList( String name, List items ) {
-    Object columnHeaders[][] = new String[][] { { name } };
+    Object[][] columnHeaders = new String[][] { { name } };
     IPentahoMetaData metaData = new MemoryMetaData( columnHeaders, null );
     MemoryResultSet result = new MemoryResultSet( metaData );
     Iterator listIterator = items.iterator();
     while ( listIterator.hasNext() ) {
       Object item = listIterator.next();
-      Object row[] = new Object[] { item };
+      Object[] row = new Object[] { item };
       result.addRow( row );
     }
     return result;
@@ -157,8 +157,8 @@ public class MemoryResultSet implements IPentahoResultSet, IPeekable, IMultiDime
 
   public static MemoryResultSet createFromActionSequenceInputsNode( Node rootNode ) {
     List colHeaders = rootNode.selectNodes( "columns/*" ); //$NON-NLS-1$
-    Object columnHeaders[][] = new String[1][colHeaders.size()];
-    String columnTypes[] = new String[colHeaders.size()];
+    Object[][] columnHeaders = new String[1][colHeaders.size()];
+    String[] columnTypes = new String[colHeaders.size()];
     for ( int i = 0; i < colHeaders.size(); i++ ) {
       Node theNode = (Node) colHeaders.get( i );
       columnHeaders[0][i] = theNode.getName();
@@ -224,7 +224,7 @@ public class MemoryResultSet implements IPentahoResultSet, IPeekable, IMultiDime
   public IPentahoResultSet memoryCopy() {
     try {
       IPentahoMetaData metadata = getMetaData();
-      Object columnHeaders[][] = metadata.getColumnHeaders();
+      Object[][] columnHeaders = metadata.getColumnHeaders();
 
       MemoryMetaData cachedMetaData = new MemoryMetaData( columnHeaders, null );
       MemoryResultSet cachedResultSet = new MemoryResultSet( cachedMetaData );
@@ -265,13 +265,13 @@ public class MemoryResultSet implements IPentahoResultSet, IPeekable, IMultiDime
 
   public Object[] nextFlattened() {
     @SuppressWarnings( "deprecation" )
-    Object rowHeaders[][] = metaData.getRowHeaders();
+    Object[][] rowHeaders = metaData.getRowHeaders();
     if ( rowHeaders == null ) {
       // we have no row headers so we can call the regular next()
       return next();
     }
     // get the row
-    Object row[] = next();
+    Object[] row = next();
     if ( row == null ) {
       // we have got to the end
       return null;
@@ -279,9 +279,9 @@ public class MemoryResultSet implements IPentahoResultSet, IPeekable, IMultiDime
     // do we have row headers to return also?
     if ( rowIndex <= rowHeaders.length ) {
       // pull out the right row headers
-      Object rowHeads[] = rowHeaders[rowIndex - 1];
+      Object[] rowHeads = rowHeaders[rowIndex - 1];
       // create the flattened row
-      Object flatRow[] = new Object[rowHeads.length + row.length];
+      Object[] flatRow = new Object[rowHeads.length + row.length];
       // copy in the row headers and row objects
       System.arraycopy( rowHeads, 0, flatRow, 0, rowHeads.length );
       System.arraycopy( row, 0, flatRow, rowHeads.length, row.length );
@@ -292,13 +292,13 @@ public class MemoryResultSet implements IPentahoResultSet, IPeekable, IMultiDime
 
   public Object[] peekFlattened() {
     @SuppressWarnings( "deprecation" )
-    Object rowHeaders[][] = metaData.getRowHeaders();
+    Object[][] rowHeaders = metaData.getRowHeaders();
     if ( rowHeaders == null ) {
       // we have no row headers so we can call the regular peek()
       return peek();
     }
     // get the row
-    Object row[] = peek();
+    Object[] row = peek();
     if ( row == null ) {
       // we have got to the end
       return null;
@@ -306,9 +306,9 @@ public class MemoryResultSet implements IPentahoResultSet, IPeekable, IMultiDime
     // do we have row headers to return also?
     if ( rowIndex <= rowHeaders.length ) {
       // pull out the right row headers
-      Object rowHeads[] = rowHeaders[rowIndex - 1];
+      Object[] rowHeads = rowHeaders[rowIndex - 1];
       // create the flattened row
-      Object flatRow[] = new Object[rowHeads.length + row.length];
+      Object[] flatRow = new Object[rowHeads.length + row.length];
       // copy in the row headers and row objects
       System.arraycopy( rowHeads, 0, flatRow, 0, rowHeads.length );
       System.arraycopy( row, 0, flatRow, rowHeads.length, row.length );

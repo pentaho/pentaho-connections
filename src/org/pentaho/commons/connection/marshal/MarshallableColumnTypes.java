@@ -34,7 +34,7 @@ public class MarshallableColumnTypes implements Serializable {
 
   private static Map<String, String> typeMap = new HashMap<String, String>();
 
-  String types[];
+  String[] types;
 
   static {
     typeMap.put( String.class.getName(), IPentahoDataTypes.TYPE_STRING );

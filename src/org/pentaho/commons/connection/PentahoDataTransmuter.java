@@ -92,9 +92,9 @@ public class PentahoDataTransmuter extends DataUtilities {
     return transmute( sourceResultSet, null, null, rowsToInclude, columnsToInclude, pivot );
   }
 
-  public IPentahoResultSet transmute( String[] columnForRowHeaders, String[] rowForColumnHeaders,
+  public IPentahoResultSet transmute( String[] columnForRowHeaders, String[] rowForColHeaders,
       String[][] rowsToInclude, String[][] columnsToInclude, boolean pivot ) {
-    return transmute( sourceResultSet, columnForRowHeaders, rowForColumnHeaders, rowsToInclude, columnsToInclude, pivot );
+    return transmute( sourceResultSet, columnForRowHeaders, rowForColHeaders, rowsToInclude, columnsToInclude, pivot );
   }
 
   /**
@@ -152,9 +152,9 @@ public class PentahoDataTransmuter extends DataUtilities {
     return transmute( source, cfrh, rfch, rti, cti, pivot );
   }
 
-  public IPentahoResultSet transmute( Integer columnForRowHeaders, Integer rowForColumnHeaders,
-      Integer[] rowsToInclude, Integer[] columnsToInclude, boolean pivot ) {
-    return transmute( sourceResultSet, columnForRowHeaders, rowForColumnHeaders, rowsToInclude, columnsToInclude, pivot );
+  public IPentahoResultSet transmute( Integer colForRowHeaders, Integer rowForColHeaders, Integer[] rowsToInclude,
+      Integer[] columnsToInclude, boolean pivot ) {
+    return transmute( sourceResultSet, colForRowHeaders, rowForColHeaders, rowsToInclude, columnsToInclude, pivot );
   }
 
   /**
@@ -513,11 +513,11 @@ public class PentahoDataTransmuter extends DataUtilities {
     }
 
     switch ( axis ) {
-    case AXIS_COLUMN:
-      return getCollapsedColumnHeaders( resultSet, seperator );
+      case AXIS_COLUMN:
+        return getCollapsedColumnHeaders( resultSet, seperator );
 
-    case AXIS_ROW:
-      return getCollapsedRowHeaders( resultSet, seperator );
+      case AXIS_ROW:
+        return getCollapsedRowHeaders( resultSet, seperator );
 
     }
     return null;
@@ -541,19 +541,17 @@ public class PentahoDataTransmuter extends DataUtilities {
       // each
       // column
       // the new row should be fully populated
-      Object colHeads[][] = memoryResultSet.getMetaData().getColumnHeaders();
+      Object[][] colHeads = memoryResultSet.getMetaData().getColumnHeaders();
 
       int rowCount = memoryResultSet.getRowCount();
       int colCount = memoryResultSet.getColumnCount();
       Object squashColumnValue = memoryResultSet.getValueAt( 0, squashColumn );
-      Object squashedRow[] = new Object[colCount];
+      Object[] squashedRow = new Object[colCount];
       List<Object[]> rowsList = new LinkedList<Object[]>();
       rowsList.add( squashedRow );
       for ( int row = 0; row < rowCount; row++ ) {
         Object newSquashColumnValue = memoryResultSet.getValueAt( row, squashColumn );
-        if ( newSquashColumnValue.equals( squashColumnValue ) ) {
-          // continue row
-        } else {
+        if ( !newSquashColumnValue.equals( squashColumnValue ) ) {
           // start a new row
           squashedRow = new Object[colCount];
           rowsList.add( squashedRow );
@@ -568,7 +566,7 @@ public class PentahoDataTransmuter extends DataUtilities {
           }
         }
       }
-      Object rows[][] = new Object[rowsList.size()][colCount];
+      Object[][] rows = new Object[rowsList.size()][colCount];
       for ( int i = 0; i < rowsList.size(); i++ ) {
         rows[i] = rowsList.get( i );
       }
@@ -749,8 +747,8 @@ public class PentahoDataTransmuter extends DataUtilities {
       throw new IllegalArgumentException( Messages.getString( "PentahoDataTransmuter.ERROR_0003_INVALID_PIVOT_COLUMN" ) ); //$NON-NLS-1$
     }
     if ( measureColumn > sourceColumnCount ) {
-      throw new IllegalArgumentException(
-          Messages.getString( "PentahoDataTransmuter.ERROR_0004_INVALID_MEASURE_COLUMN" ) ); //$NON-NLS-1$
+      throw new IllegalArgumentException( Messages
+          .getString( "PentahoDataTransmuter.ERROR_0004_INVALID_MEASURE_COLUMN" ) ); //$NON-NLS-1$
     }
     if ( columnToSortColumnsBy > sourceColumnCount ) {
       throw new IllegalArgumentException( Messages.getString( "PentahoDataTransmuter.ERROR_0005_INVALID_SORT_COLUMN" ) ); //$NON-NLS-1$
@@ -794,16 +792,16 @@ public class PentahoDataTransmuter extends DataUtilities {
     while ( rowData != null ) {
       colPivotData = rowData[columnToPivot]; // The data we're pivoting to columns
       if ( colPivotData == null ) {
-        throw new IllegalArgumentException(
-            Messages.getString( "PentahoDataTransmuter.ERROR_0006_CANNOT_PIVOT_NULL_DATA" ) ); //$NON-NLS-1$
+        throw new IllegalArgumentException( Messages
+            .getString( "PentahoDataTransmuter.ERROR_0006_CANNOT_PIVOT_NULL_DATA" ) ); //$NON-NLS-1$
       }
       colMeasureData = rowData[measureColumn]; // The value data we're
       // using as the final set.
       if ( columnToSortColumnsBy >= 0 ) {
         colToSortByRaw = rowData[columnToSortColumnsBy];
         if ( colToSortByRaw == null ) {
-          throw new IllegalArgumentException(
-              Messages.getString( "PentahoDataTransmuter.ERROR_0007_CANNOT_SORT_NULL_DATA" ) ); //$NON-NLS-1$
+          throw new IllegalArgumentException( Messages
+              .getString( "PentahoDataTransmuter.ERROR_0007_CANNOT_SORT_NULL_DATA" ) ); //$NON-NLS-1$
         }
         if ( sortDataFormatter != null ) {
           columnPrefix = sortDataFormatter.format( colToSortByRaw );
@@ -1108,8 +1106,8 @@ public class PentahoDataTransmuter extends DataUtilities {
       throw new IllegalArgumentException( Messages.getString( "PentahoDataTransmuter.ERROR_0003_INVALID_PIVOT_COLUMN" ) ); //$NON-NLS-1$
     }
     if ( measureColumn > sourceColumnCount ) {
-      throw new IllegalArgumentException(
-          Messages.getString( "PentahoDataTransmuter.ERROR_0004_INVALID_MEASURE_COLUMN" ) ); //$NON-NLS-1$
+      throw new IllegalArgumentException( Messages
+          .getString( "PentahoDataTransmuter.ERROR_0004_INVALID_MEASURE_COLUMN" ) ); //$NON-NLS-1$
     }
     if ( columnToSortColumnsBy > sourceColumnCount ) {
       throw new IllegalArgumentException( Messages.getString( "PentahoDataTransmuter.ERROR_0005_INVALID_SORT_COLUMN" ) ); //$NON-NLS-1$
@@ -1174,16 +1172,16 @@ public class PentahoDataTransmuter extends DataUtilities {
     while ( rowData != null ) {
       colPivotData = rowData[columnToPivot]; // The data we're pivoting to columns
       if ( colPivotData == null ) {
-        throw new IllegalArgumentException(
-            Messages.getString( "PentahoDataTransmuter.ERROR_0006_CANNOT_PIVOT_NULL_DATA" ) ); //$NON-NLS-1$
+        throw new IllegalArgumentException( Messages
+            .getString( "PentahoDataTransmuter.ERROR_0006_CANNOT_PIVOT_NULL_DATA" ) ); //$NON-NLS-1$
       }
 
       // newColumnHeadersRaw.add(colPivotData);
       if ( columnToSortColumnsBy >= 0 ) {
         colToSortByRaw = rowData[columnToSortColumnsBy];
         if ( colToSortByRaw == null ) {
-          throw new IllegalArgumentException(
-              Messages.getString( "PentahoDataTransmuter.ERROR_0007_CANNOT_SORT_NULL_DATA" ) ); //$NON-NLS-1$
+          throw new IllegalArgumentException( Messages
+              .getString( "PentahoDataTransmuter.ERROR_0007_CANNOT_SORT_NULL_DATA" ) ); //$NON-NLS-1$
         }
         if ( sortDataFormatter != null ) {
           columnPrefix = sortDataFormatter.format( colToSortByRaw );

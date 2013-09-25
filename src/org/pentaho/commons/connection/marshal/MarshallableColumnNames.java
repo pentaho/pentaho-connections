@@ -25,7 +25,7 @@ public class MarshallableColumnNames implements Serializable {
 
   private static final long serialVersionUID = -1224364938886117109L;
 
-  String names[];
+  String[] names;
 
   public MarshallableColumnNames() {
   }

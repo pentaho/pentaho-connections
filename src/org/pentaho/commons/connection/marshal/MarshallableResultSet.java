@@ -56,8 +56,8 @@ public class MarshallableResultSet implements Serializable {
 
     // create the metadata
     IPentahoMetaData metadata = results.getMetaData();
-    String tmp[] = new String[colCount];
-    Object colHeaders[][] = metadata.getColumnHeaders();
+    String[] tmp = new String[colCount];
+    Object[][] colHeaders = metadata.getColumnHeaders();
     for ( int colNo = 0; colNo < colHeaders[0].length; colNo++ ) {
       tmp[colNo] = colHeaders[0][colNo].toString();
     }
@@ -71,7 +71,7 @@ public class MarshallableResultSet implements Serializable {
     List<MarshallableRow> rowList = new ArrayList<MarshallableRow>();
 
     int unknownTypes = colCount;
-    String tmpTypes[] = new String[colCount];
+    String[] tmpTypes = new String[colCount];
     Object[] rowObjects = results.next();
     while ( rowObjects != null ) {
       MarshallableRow row = new MarshallableRow();

@@ -40,14 +40,14 @@ public class MemoryResultSetTest extends TestCase {
 
     assertNull( "row headers are wrong", metadata.getRowHeaders() );
     assertNotNull( "col headers are wrong", metadata.getColumnHeaders() );
-    Object headers[][] = metadata.getColumnHeaders();
+    Object[][] headers = metadata.getColumnHeaders();
 
     assertEquals( 1, headers.length );
     assertEquals( 2, headers[0].length );
     assertEquals( "col1", headers[0][0] );
     assertEquals( "col2", headers[0][1] );
 
-    String types[] = metadata.getColumnTypes();
+    String[] types = metadata.getColumnTypes();
     assertNotNull( types );
 
     assertEquals( 2, types.length );
@@ -61,9 +61,9 @@ public class MemoryResultSetTest extends TestCase {
 
   public void testMetadata2() {
 
-    String colHeaders[][] = new String[][] { { "col1", "col2" } };
+    String[][] colHeaders = new String[][] { { "col1", "col2" } };
 
-    String rowHeaders[][] = new String[][] { { "row1" }, { "row2" } };
+    String[][] rowHeaders = new String[][] { { "row1" }, { "row2" } };
 
     MemoryMetaData metadata = new MemoryMetaData( colHeaders, rowHeaders );
 
@@ -72,7 +72,7 @@ public class MemoryResultSetTest extends TestCase {
 
     assertNotNull( "row headers are wrong", metadata.getRowHeaders() );
     assertNotNull( "col headers are wrong", metadata.getColumnHeaders() );
-    Object headers[][] = metadata.getColumnHeaders();
+    Object[][] headers = metadata.getColumnHeaders();
 
     assertEquals( 1, headers.length );
     assertEquals( 2, headers[0].length );
@@ -238,7 +238,7 @@ public class MemoryResultSetTest extends TestCase {
     data.addRow( new Object[] { "b", new Integer( 2 ) } );
     data.addRow( new Object[] { "c", new Integer( 3 ) } );
 
-    Object col[] = data.getDataColumn( 0 );
+    Object[] col = data.getDataColumn( 0 );
     assertEquals( 3, col.length );
     assertEquals( "a", col[0] );
     assertEquals( "b", col[1] );
@@ -261,7 +261,7 @@ public class MemoryResultSetTest extends TestCase {
     data.addRow( new Object[] { "b", new Integer( 2 ) } );
     data.addRow( new Object[] { "c", new Integer( 3 ) } );
 
-    Object row[] = data.getDataRow( 0 );
+    Object[] row = data.getDataRow( 0 );
     assertEquals( 2, row.length );
     assertEquals( "a", row[0] );
     assertEquals( 1, row[1] );
@@ -285,7 +285,7 @@ public class MemoryResultSetTest extends TestCase {
     data.addRow( new Object[] { "b", new Integer( 2 ) } );
     data.addRow( new Object[] { "c", new Integer( 3 ) } );
 
-    Object row[] = data.peek();
+    Object[] row = data.peek();
     assertEquals( "a", row[0] );
     assertEquals( 1, row[1] );
 
@@ -348,7 +348,7 @@ public class MemoryResultSetTest extends TestCase {
 
     MemoryMetaData metadata =
         new MemoryMetaData( new String[][] { { "col1", "col2" } }, new String[][] { { "2009", "item1" },
-            { "2009", "item2" }, { "2008", "item1" } } );
+          { "2009", "item2" }, { "2008", "item1" } } );
 
     MemoryResultSet data = new MemoryResultSet( metadata );
 
@@ -356,7 +356,7 @@ public class MemoryResultSetTest extends TestCase {
     data.addRow( new Object[] { "b", new Integer( 2 ) } );
     data.addRow( new Object[] { "c", new Integer( 3 ) } );
 
-    Object row[] = data.peekFlattened();
+    Object[] row = data.peekFlattened();
     assertEquals( "2009", row[0] );
     assertEquals( "item1", row[1] );
     assertEquals( "a", row[2] );
@@ -449,7 +449,7 @@ public class MemoryResultSetTest extends TestCase {
     data.addRow( new Object[] { "b", new Integer( 2 ) } );
     data.addRow( new Object[] { "c", new Integer( 3 ) } );
 
-    Object row[] = data.peekFlattened();
+    Object[] row = data.peekFlattened();
     assertEquals( "a", row[0] );
     assertEquals( 1, row[1] );
 
@@ -513,7 +513,7 @@ public class MemoryResultSetTest extends TestCase {
     // test what happens when there are fewer row headers than rows
     MemoryMetaData metadata =
         new MemoryMetaData( new String[][] { { "col1", "col2" } }, new String[][] { { "2009", "item1" },
-            { "2009", "item2" } } );
+          { "2009", "item2" } } );
 
     MemoryResultSet data = new MemoryResultSet( metadata );
 
@@ -521,7 +521,7 @@ public class MemoryResultSetTest extends TestCase {
     data.addRow( new Object[] { "b", new Integer( 2 ) } );
     data.addRow( new Object[] { "c", new Integer( 3 ) } );
 
-    Object row[] = data.peekFlattened();
+    Object[] row = data.peekFlattened();
     assertEquals( "2009", row[0] );
     assertEquals( "item1", row[1] );
     assertEquals( "a", row[2] );
@@ -600,7 +600,7 @@ public class MemoryResultSetTest extends TestCase {
 
     MemoryMetaData metadata =
         new MemoryMetaData( new String[][] { { "col1", "col2" } }, new String[][] { { "2009", "item1" },
-            { "2009", "item2" }, { "2008", "item1" }, } );
+          { "2009", "item2" }, { "2008", "item1" }, } );
 
     MemoryResultSet data = new MemoryResultSet( metadata );
 
@@ -608,11 +608,11 @@ public class MemoryResultSetTest extends TestCase {
 
     metadata.generateColumnNames();
 
-    String tmp[] = metadata.getRowHeaderNames();
+    String[] tmp = metadata.getRowHeaderNames();
     assertEquals( "Year", tmp[0] );
     assertEquals( "Item", tmp[1] );
 
-    String columnNames[] = metadata.getFlattenedColumnNames();
+    String[] columnNames = metadata.getFlattenedColumnNames();
 
     assertEquals( "wrong number of column names", 4, columnNames.length );
     assertEquals( "wrong column name", "Year", columnNames[0] );
@@ -626,7 +626,7 @@ public class MemoryResultSetTest extends TestCase {
 
     MemoryMetaData metadata =
         new MemoryMetaData( new String[][] { { "col1", "col2" }, { "subcol1", "subcol2" } }, new String[][] {
-            { "2009", "item1" }, { "2009", "item2" }, { "2008", "item1" }, } );
+          { "2009", "item1" }, { "2009", "item2" }, { "2008", "item1" }, } );
 
     MemoryResultSet data = new MemoryResultSet( metadata );
 
@@ -634,7 +634,7 @@ public class MemoryResultSetTest extends TestCase {
     metadata.setColumnNameFormat( "{0}::{1}" );
     metadata.generateColumnNames();
 
-    String columnNames[] = metadata.getFlattenedColumnNames();
+    String[] columnNames = metadata.getFlattenedColumnNames();
 
     assertEquals( "wrong number of column names", 4, columnNames.length );
     assertEquals( "wrong column name", "Year", columnNames[0] );
@@ -681,7 +681,7 @@ public class MemoryResultSetTest extends TestCase {
 
     MemoryResultSet data =
         MemoryResultSet.createFromArrays( new String[][] { { "col1", "col2" } }, new Object[][] { { "a", 1 },
-            { "b", 2 }, { "c", 3 } } );
+          { "b", 2 }, { "c", 3 } } );
 
     assertNotNull( data.getMetaData() );
     assertNotNull( data.getMetaData().getColumnHeaders() );
@@ -783,10 +783,10 @@ public class MemoryResultSetTest extends TestCase {
 
     sb.append( "<data>" ).append( "<columns>" ).append( "<col1 type=\"type1\"/>" ).append( "<col2 type=\"type2\"/>" )
         .append( "<col3 type=\"type2\"/>" ).append( "</columns>" ).append( "<default-value>" ).append( "<row>" )
-        .append( "<col1>a</col1>" ).append( "<col2>1</col2>" ).append( "</row>" ).append( "<row>" )
-        .append( "<col1>b</col1>" ).append( "<col2>2</col2>" ).append( "</row>" ).append( "<row>" )
-        .append( "<col1>c</col1>" ).append( "<col2>3</col2>" ).append( "</row>" ).append( "</default-value>" )
-        .append( "</data>" );
+        .append( "<col1>a</col1>" ).append( "<col2>1</col2>" ).append( "</row>" ).append( "<row>" ).append(
+            "<col1>b</col1>" ).append( "<col2>2</col2>" ).append( "</row>" ).append( "<row>" )
+        .append( "<col1>c</col1>" ).append( "<col2>3</col2>" ).append( "</row>" ).append( "</default-value>" ).append(
+            "</data>" );
 
     Document doc = DocumentHelper.parseText( sb.toString() );
     Node node = (Node) doc.getRootElement();

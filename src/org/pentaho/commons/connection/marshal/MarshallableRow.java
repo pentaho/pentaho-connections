@@ -29,7 +29,7 @@ public class MarshallableRow implements Serializable {
 
   private static final long serialVersionUID = 3397670591600236990L;
 
-  String row[];
+  String[] row;
 
   public MarshallableRow() {
   }

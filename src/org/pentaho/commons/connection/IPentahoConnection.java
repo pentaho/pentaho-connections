@@ -89,7 +89,7 @@ public interface IPentahoConnection {
    * Array of the XML element keys defined above.
    */
   public static final String[] KEYS = new String[] { CLASSNAME_KEY, JNDI_NAME_KEY, DRIVER_KEY, LOCATION_KEY,
-      USERNAME_KEY, PASSWORD_KEY, QUERY_KEY };
+    USERNAME_KEY, PASSWORD_KEY, QUERY_KEY };
 
   /**
    * Sets the properties to be used when the connection is made. The standard keys for the properties are defined in

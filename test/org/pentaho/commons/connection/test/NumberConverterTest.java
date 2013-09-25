@@ -65,9 +65,9 @@ public class NumberConverterTest {
   @Parameters
   public static Collection values() {
     return Arrays.asList( new Object[][] {
-        { true, 1699.01, new Object[] { "1,699.01", "$1,699.01", "1699.01", "1699.01abc", new Double( 1699.01 ) } }, //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-        { true, -1699.01, new Object[] { "-1699.01" } }, //$NON-NLS-1$
-        { true, 1699.0, new Object[] { 1699 } }, { false, 1699.01, new Object[] { "abc1699.01" } }, //$NON-NLS-1$
-        { false, 0.0, new Object[] { null } }, { false, 0.0, new Object[] { new ArrayList() } }, } );
+      { true, 1699.01, new Object[] { "1,699.01", "$1,699.01", "1699.01", "1699.01abc", new Double( 1699.01 ) } }, //$NON-NLS-1$//$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+      { true, -1699.01, new Object[] { "-1699.01" } }, //$NON-NLS-1$
+      { true, 1699.0, new Object[] { 1699 } }, { false, 1699.01, new Object[] { "abc1699.01" } }, //$NON-NLS-1$
+      { false, 0.0, new Object[] { null } }, { false, 0.0, new Object[] { new ArrayList() } }, } );
   }
 }

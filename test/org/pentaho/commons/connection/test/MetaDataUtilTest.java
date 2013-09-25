@@ -21,6 +21,10 @@ import org.pentaho.commons.connection.MetaDataUtil;
 @SuppressWarnings( { "all" } )
 public class MetaDataUtilTest extends TestCase {
 
+  static final String[] colHeadersMay = { "May", "May", "May" };
+  static final String[] colHeaders2009 = { "2009", "2009", "2009" };
+  static final String[] colHeadersABV = { "Actual", "Budget", "Variance" };
+
   public void testSimpleCase1() {
 
     // instancing the class should not cause problems
@@ -28,15 +32,15 @@ public class MetaDataUtilTest extends TestCase {
 
     // no row headers, single set of column headers
 
-    String columnHeaders[][] = { { "Country", "Actual", "Budget" } };
+    String[][] columnHeaders = { { "Country", "Actual", "Budget" } };
 
-    String rowHeaders[][] = null;
+    String[][] rowHeaders = null;
 
-    String rowHeaderNames[] = null;
+    String[] rowHeaderNames = null;
 
     String columnNameFormatStr = null;
 
-    String columnNames[] =
+    String[] columnNames =
         MetaDataUtil.generateColumnNames( columnHeaders, rowHeaders, rowHeaderNames, columnNameFormatStr );
 
     assertNotNull( "column names are null", columnNames );
@@ -53,15 +57,15 @@ public class MetaDataUtilTest extends TestCase {
 
     // no row headers, double column headers
 
-    String columnHeaders[][] = { { "Actual", "Budget", "Variance" }, { "2009", "2009", "2009" } };
+    String[][] columnHeaders = { colHeadersABV, colHeaders2009 };
 
-    String rowHeaders[][] = null;
+    String[][] rowHeaders = null;
 
-    String rowHeaderNames[] = null;
+    String[] rowHeaderNames = null;
 
     String columnNameFormatStr = null;
 
-    String columnNames[] =
+    String[] columnNames =
         MetaDataUtil.generateColumnNames( columnHeaders, rowHeaders, rowHeaderNames, columnNameFormatStr );
 
     assertNotNull( "column names are null", columnNames );
@@ -80,16 +84,15 @@ public class MetaDataUtilTest extends TestCase {
 
     // no row headers, triple column headers
 
-    String columnHeaders[][] =
-        { { "May", "May", "May" }, { "2009", "2009", "2009" }, { "Actual", "Budget", "Variance" } };
+    String[][] columnHeaders = { colHeadersMay, colHeaders2009, colHeadersABV };
 
-    String rowHeaders[][] = null;
+    String[][] rowHeaders = null;
 
-    String rowHeaderNames[] = null;
+    String[] rowHeaderNames = null;
 
     String columnNameFormatStr = null;
 
-    String columnNames[] =
+    String[] columnNames =
         MetaDataUtil.generateColumnNames( columnHeaders, rowHeaders, rowHeaderNames, columnNameFormatStr );
 
     assertNotNull( "column names are null", columnNames );
@@ -109,16 +112,15 @@ public class MetaDataUtilTest extends TestCase {
 
     // no row headers, triple column headers
 
-    String columnHeaders[][] =
-        { { "May", "May", "May" }, { "2009", "2009", "2009" }, { "Actual", "Budget", "Variance" } };
+    String[][] columnHeaders = { colHeadersMay, colHeaders2009, colHeadersABV };
 
-    String rowHeaders[][] = null;
+    String[][] rowHeaders = null;
 
-    String rowHeaderNames[] = null;
+    String[] rowHeaderNames = null;
 
     String columnNameFormatStr = "{2} {0}/{1}";
 
-    String columnNames[] =
+    String[] columnNames =
         MetaDataUtil.generateColumnNames( columnHeaders, rowHeaders, rowHeaderNames, columnNameFormatStr );
 
     assertNotNull( "column names are null", columnNames );
@@ -135,15 +137,15 @@ public class MetaDataUtilTest extends TestCase {
 
     // single row headers without names, single column headers
 
-    String columnHeaders[][] = { { "Actual", "Budget", "Variance" } };
+    String[][] columnHeaders = { { "Actual", "Budget", "Variance" } };
 
-    String rowHeaders[][] = { { "2008" }, { "2009" } };
+    String[][] rowHeaders = { { "2008" }, { "2009" } };
 
-    String rowHeaderNames[] = null;
+    String[] rowHeaderNames = null;
 
     String columnNameFormatStr = null;
 
-    String columnNames[] =
+    String[] columnNames =
         MetaDataUtil.generateColumnNames( columnHeaders, rowHeaders, rowHeaderNames, columnNameFormatStr );
 
     assertNotNull( "column names are null", columnNames );
@@ -161,15 +163,15 @@ public class MetaDataUtilTest extends TestCase {
 
     // double row headers without names, single column headers
 
-    String columnHeaders[][] = { { "Actual", "Budget", "Variance" } };
+    String[][] columnHeaders = { colHeadersABV };
 
-    String rowHeaders[][] = { { "2008", "May" }, { "2009", "May" } };
+    String[][] rowHeaders = { { "2008", "May" }, { "2009", "May" } };
 
-    String rowHeaderNames[] = null;
+    String[] rowHeaderNames = null;
 
     String columnNameFormatStr = null;
 
-    String columnNames[] =
+    String[] columnNames =
         MetaDataUtil.generateColumnNames( columnHeaders, rowHeaders, rowHeaderNames, columnNameFormatStr );
 
     assertNotNull( "column names are null", columnNames );
@@ -188,15 +190,15 @@ public class MetaDataUtilTest extends TestCase {
 
     // single row headers with names, single column headers, no row header names
 
-    String columnHeaders[][] = { { "Actual", "Budget", "Variance" } };
+    String[][] columnHeaders = { colHeadersABV };
 
-    String rowHeaders[][] = { { "2008" }, { "2009" } };
+    String[][] rowHeaders = { { "2008" }, { "2009" } };
 
-    String rowHeaderNames[] = { "Year" };
+    String[] rowHeaderNames = { "Year" };
 
     String columnNameFormatStr = null;
 
-    String columnNames[] =
+    String[] columnNames =
         MetaDataUtil.generateColumnNames( columnHeaders, rowHeaders, rowHeaderNames, columnNameFormatStr );
 
     assertNotNull( "column names are null", columnNames );
@@ -214,15 +216,15 @@ public class MetaDataUtilTest extends TestCase {
 
     // double row headers with names, single column headers, no row header names
 
-    String columnHeaders[][] = { { "Actual", "Budget", "Variance" } };
+    String[][] columnHeaders = { colHeadersABV };
 
-    String rowHeaders[][] = { { "2008", "May" }, { "2009", "May" } };
+    String[][] rowHeaders = { { "2008", "May" }, { "2009", "May" } };
 
-    String rowHeaderNames[] = { "Year", "Month" };
+    String[] rowHeaderNames = { "Year", "Month" };
 
     String columnNameFormatStr = null;
 
-    String columnNames[] =
+    String[] columnNames =
         MetaDataUtil.generateColumnNames( columnHeaders, rowHeaders, rowHeaderNames, columnNameFormatStr );
 
     assertNotNull( "column names are null", columnNames );
@@ -241,15 +243,15 @@ public class MetaDataUtilTest extends TestCase {
 
     // double row headers, wrong number of row header names
 
-    String columnHeaders[][] = { { "Actual", "Budget", "Variance" } };
+    String[][] columnHeaders = { colHeadersABV };
 
-    String rowHeaders[][] = { { "2008", "May" }, { "2009", "May" } };
+    String[][] rowHeaders = { { "2008", "May" }, { "2009", "May" } };
 
-    String rowHeaderNames[] = { "Year" };
+    String[] rowHeaderNames = { "Year" };
 
     String columnNameFormatStr = null;
 
-    String columnNames[] =
+    String[] columnNames =
         MetaDataUtil.generateColumnNames( columnHeaders, rowHeaders, rowHeaderNames, columnNameFormatStr );
 
     assertNotNull( "column names are null", columnNames );
@@ -268,16 +270,15 @@ public class MetaDataUtilTest extends TestCase {
 
     // double row headers with names, single column headers, no row header names
 
-    String columnHeaders[][] =
-        { { "May", "May", "May" }, { "2009", "2009", "2009" }, { "Actual", "Budget", "Variance" } };
+    String[][] columnHeaders = { colHeadersMay, colHeaders2009, colHeadersABV };
 
-    String rowHeaders[][] = { { "PL 1", "SKU1" }, { "PL 1", "SKU2" } };
+    String[][] rowHeaders = { { "PL 1", "SKU1" }, { "PL 1", "SKU2" } };
 
-    String rowHeaderNames[] = { "Product Line", "Product Code" };
+    String[] rowHeaderNames = { "Product Line", "Product Code" };
 
     String columnNameFormatStr = "{2} {0}/{1}";
 
-    String columnNames[] =
+    String[] columnNames =
         MetaDataUtil.generateColumnNames( columnHeaders, rowHeaders, rowHeaderNames, columnNameFormatStr );
 
     assertNotNull( "column names are null", columnNames );

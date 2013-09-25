@@ -29,7 +29,6 @@ import org.pentaho.commons.connection.marshal.ResultSetMarshaller;
 import org.pentaho.commons.connection.memory.MemoryMetaData;
 import org.pentaho.commons.connection.memory.MemoryResultSet;
 
-@SuppressWarnings( { "all" } )
 public class MarshallableResultSetTest extends TestCase {
 
   public void testWSResultSet1() {
@@ -50,20 +49,30 @@ public class MarshallableResultSetTest extends TestCase {
 
   }
 
+  static final String mystr = "mystr";
+  static final String myint = "myint";
+  static final String mylong = "mylong";
+  static final String mybool = "mybool";
+  static final String mydec = "mydec";
+  static final String mydate = "mydate";
+  static final String myfloat = "myfloat";
+  static final String mydouble = "mydouble";
+  static final String myunk = "myunknown";
+
+  @SuppressWarnings( "deprecation" )
   public void testUtil() {
 
     // this should not throw errors
     new ResultSetMarshaller();
 
-    MemoryMetaData metadata =
-        new MemoryMetaData( new String[][] { { "mystr", "myint", "mylong", "mybool", "mydecimal", "mydate", "myfloat",
-            "mydouble", "myunknown" } }, null );
+    String[][] mdStrings = new String[][] { { mystr, myint, mylong, mybool, mydec, mydate, myfloat, mydouble, myunk } };
+    MemoryMetaData metadata = new MemoryMetaData( mdStrings, null );
     MemoryResultSet data = new MemoryResultSet( metadata );
 
     data.addRow( new Object[] { "apple", 1, new Long( Integer.MAX_VALUE + 1 ), true, new BigDecimal( "10.99" ),
-        new Date( 98, 1, 14 ), null, new Double( 123.45 ), null } );
+      new Date( 98, 1, 14 ), null, new Double( 123.45 ), null } );
     data.addRow( new Object[] { "banana", 20, new Long( Integer.MIN_VALUE - 1 ), false,
-        new BigDecimal( "1000000000000.99" ), new Date( 109, 1, 4 ), new Float( 99.9 ), null, null } );
+      new BigDecimal( "1000000000000.99" ), new Date( 109, 1, 4 ), new Float( 99.9 ), null, null } );
     data.addRow( new Object[] { "", 333, (long) 0, true, null, null, new Float( 99.9 ), new Double( 123.45 ), null } );
 
     MarshallableResultSet wsData = ResultSetMarshaller.fromResultSet( data );
@@ -75,17 +84,17 @@ public class MarshallableResultSetTest extends TestCase {
 
     IPentahoMetaData metadata2 = result.getMetaData();
 
-    assertEquals( "mystr", metadata2.getColumnHeaders()[0][0] );
-    assertEquals( "myint", metadata2.getColumnHeaders()[0][1] );
-    assertEquals( "mylong", metadata2.getColumnHeaders()[0][2] );
-    assertEquals( "mybool", metadata2.getColumnHeaders()[0][3] );
-    assertEquals( "mydecimal", metadata2.getColumnHeaders()[0][4] );
-    assertEquals( "mydate", metadata2.getColumnHeaders()[0][5] );
-    assertEquals( "myfloat", metadata2.getColumnHeaders()[0][6] );
-    assertEquals( "mydouble", metadata2.getColumnHeaders()[0][7] );
-    assertEquals( "myunknown", metadata2.getColumnHeaders()[0][8] );
+    assertEquals( mystr, metadata2.getColumnHeaders()[0][0] );
+    assertEquals( myint, metadata2.getColumnHeaders()[0][1] );
+    assertEquals( mylong, metadata2.getColumnHeaders()[0][2] );
+    assertEquals( mybool, metadata2.getColumnHeaders()[0][3] );
+    assertEquals( mydec, metadata2.getColumnHeaders()[0][4] );
+    assertEquals( mydate, metadata2.getColumnHeaders()[0][5] );
+    assertEquals( myfloat, metadata2.getColumnHeaders()[0][6] );
+    assertEquals( mydouble, metadata2.getColumnHeaders()[0][7] );
+    assertEquals( myunk, metadata2.getColumnHeaders()[0][8] );
 
-    Object row[] = result.next();
+    Object[] row = result.next();
     assertEquals( "apple", row[0] );
     assertEquals( 1, row[1] );
     assertEquals( new Long( Integer.MAX_VALUE + 1 ), row[2] );
@@ -142,9 +151,8 @@ public class MarshallableResultSetTest extends TestCase {
 
   public void testNoRows() {
 
-    MemoryMetaData metadata =
-        new MemoryMetaData( new String[][] { { "mystr", "myint", "mylong", "mybool", "mydecimal", "mydate", "myfloat",
-            "mydouble" } }, null );
+    String[][] mdString = new String[][] { { mystr, myint, mylong, mybool, mydec, mydate, myfloat, mydouble } };
+    MemoryMetaData metadata = new MemoryMetaData( mdString, null );
     MemoryResultSet data = new MemoryResultSet( metadata );
 
     MarshallableResultSet wsData = ResultSetMarshaller.fromResultSet( data );
@@ -186,7 +194,7 @@ public class MarshallableResultSetTest extends TestCase {
 
     MarshallableColumnNames colNames = result.getColumnNames();
     assertNotNull( colNames );
-    String cols[] = colNames.getColumnName();
+    String[] cols = colNames.getColumnName();
     assertNotNull( cols );
     assertEquals( 2, cols.length );
     assertEquals( "col1", cols[0] );
@@ -194,19 +202,19 @@ public class MarshallableResultSetTest extends TestCase {
 
     MarshallableColumnTypes colTypes = result.getColumnTypes();
     assertNotNull( colTypes );
-    String types[] = colTypes.getColumnType();
+    String[] types = colTypes.getColumnType();
     assertNotNull( types );
     assertEquals( 2, types.length );
     assertEquals( IPentahoDataTypes.TYPE_STRING, types[0] );
     assertEquals( IPentahoDataTypes.TYPE_INT, types[1] );
 
-    MarshallableRow rows[] = result.getRows();
+    MarshallableRow[] rows = result.getRows();
     assertNotNull( rows );
     assertEquals( 3, rows.length );
 
     MarshallableRow row = rows[0];
     assertNotNull( row );
-    String cells[] = row.getCell();
+    String[] cells = row.getCell();
     assertEquals( 2, cells.length );
     assertEquals( "a", cells[0] );
     assertEquals( "1", cells[1] );

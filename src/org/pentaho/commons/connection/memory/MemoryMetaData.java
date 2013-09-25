@@ -40,7 +40,7 @@ public class MemoryMetaData extends AbstractPentahoMetaData implements IMultiDim
 
   @SuppressWarnings( "rawtypes" )
   public MemoryMetaData( List columnHeadersList ) {
-    Object tmp[][] = new String[1][columnHeadersList.size()];
+    Object[][] tmp = new String[1][columnHeadersList.size()];
     for ( int i = 0; i < columnHeadersList.size(); i++ ) {
       tmp[0][i] = columnHeadersList.get( i );
     }
@@ -48,7 +48,7 @@ public class MemoryMetaData extends AbstractPentahoMetaData implements IMultiDim
     this.rowHeaders = null;
   }
 
-  public void setColumnTypes( String columnTypes[] ) {
+  public void setColumnTypes( String[] columnTypes ) {
     this.columnTypes = columnTypes;
   }
 

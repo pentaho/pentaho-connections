@@ -66,13 +66,13 @@ public class DataTest {
         + "RHead:6,2|\tRHead:6,1|\tRHead:6,0|\tData: 6,0|\tData: 6,1|\tData: 6,2|\tData: 6,3|\tData: 6,4|\t\n" //$NON-NLS-1$
         + "RHead:7,2|\tRHead:7,1|\tRHead:7,0|\tData: 7,0|\tData: 7,1|\tData: 7,2|\tData: 7,3|\tData: 7,4|\t\n\n", //$NON-NLS-1$
         results );
-    String[][] rowsToInclude = { { "RHead:1,0", "RHead:1,1", "RHead:1,2" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        { "RHead:3,0", "RHead:3,1", "RHead:3,2" }, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        { "RHead:7,0", "RHead:7,1", "RHead:7,2" } //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-        };
-    String[][] columnsToInclude = { { "CHead:0,0", "CHead:1,0" }, //$NON-NLS-1$ //$NON-NLS-2$
-        { "CHead:0,3", "CHead:1,3" } //$NON-NLS-1$ //$NON-NLS-2$
-        };
+    String[] row1 = { "RHead:1,0", "RHead:1,1", "RHead:1,2" };
+    String[] row2 = { "RHead:3,0", "RHead:3,1", "RHead:3,2" };
+    String[] row3 = { "RHead:7,0", "RHead:7,1", "RHead:7,2" };
+    String[] col1 = { "CHead:0,0", "CHead:1,0" };
+    String[] col2 = { "CHead:0,3", "CHead:1,3" };
+    String[][] rowsToInclude = { row1, row2, row3 };
+    String[][] columnsToInclude = { col1, col2 };
 
     IPentahoResultSet testResults =
         PentahoDataTransmuter.transmute( resultSet, null, null, rowsToInclude, columnsToInclude, false );

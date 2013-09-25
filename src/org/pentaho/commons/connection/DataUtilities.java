@@ -131,18 +131,19 @@ public class DataUtilities implements IPentahoDataTypes {
    * @return String containing XML which represents the data (eg for use with xquery)
    */
   public static String getXMLString( IPentahoResultSet resultSet ) {
+    String xmlResultString = null;
     Document document = DOMDocumentFactory.getInstance().createDocument();
     org.dom4j.Element resultSetNode = document.addElement( "result-set" ); //$NON-NLS-1$
     Object[] colHeaders = resultSet.getMetaData().getColumnHeaders()[0];
     String metaDataStr = ""; //$NON-NLS-1$
-    Object firstDataRow[] = resultSet.getDataRow( 0 );
+    Object[] firstDataRow = resultSet.getDataRow( 0 );
     for ( int i = 0; i < firstDataRow.length; i++ ) {
       metaDataStr += firstDataRow[i].getClass().getName() + ( i == firstDataRow.length - 1 ? "" : "," ); //$NON-NLS-1$//$NON-NLS-2$
     }
     resultSetNode.addComment( metaDataStr );
     int rowCount = resultSet.getRowCount();
     for ( int i = 0; i < rowCount; i++ ) {
-      Object row[] = resultSet.getDataRow( i );
+      Object[] row = resultSet.getDataRow( i );
       org.dom4j.Element rowNode = resultSetNode.addElement( "row" ); //$NON-NLS-1$
       for ( int j = 0; j < row.length; j++ ) {
         String column = colHeaders[j].toString();
@@ -159,11 +160,12 @@ public class DataUtilities implements IPentahoDataTypes {
     try {
       XMLWriter writer = new XMLWriter( outStream, format );
       writer.write( document );
-      return outStream.toString();
+      xmlResultString = outStream.toString();
     } catch ( Exception e ) {
-      // fall through and try to return the xml unformatted
+      // try to return the xml unformatted
+      xmlResultString = document.asXML();
     }
-    return document.asXML();
+    return xmlResultString;
   }
 
   /**

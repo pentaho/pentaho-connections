@@ -27,7 +27,7 @@ public class MetaDataUtil {
    * @param columnNameFormatStr
    * @return
    */
-  public static String[] generateColumnNames( Object columnHeaders[][], Object rowHeaders[][], String rowHeaderNames[],
+  public static String[] generateColumnNames( Object[][] columnHeaders, Object[][] rowHeaders, String[] rowHeaderNames,
       String columnNameFormatStr ) {
     // look at the row headers
     boolean haveRowHeaderNames = false;

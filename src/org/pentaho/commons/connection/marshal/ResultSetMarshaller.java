@@ -55,10 +55,10 @@ public class ResultSetMarshaller {
 
     MarshallableColumnNames columnNames = data.getColumnNames();
     MarshallableColumnTypes columnTypes = data.getColumnTypes();
-    MarshallableRow rows[] = data.getRows();
+    MarshallableRow[] rows = data.getRows();
 
-    String names[] = columnNames.getColumnName();
-    String types[] = columnTypes.getColumnType();
+    String[] names = columnNames.getColumnName();
+    String[] types = columnTypes.getColumnType();
 
     MemoryMetaData metadata = new MemoryMetaData( new Object[][] { names }, null );
     metadata.setColumnTypes( types );
@@ -66,8 +66,8 @@ public class ResultSetMarshaller {
     int columnCount = names.length;
 
     for ( int i = 0; i < rows.length; i++ ) {
-      String rowAsStrings[] = rows[i].getCell();
-      Object row[] = new Object[columnCount];
+      String[] rowAsStrings = rows[i].getCell();
+      Object[] row = new Object[columnCount];
       // TODO - parsing to get original types back
       for ( int colNo = 0; colNo < columnCount; colNo++ ) {
         row[colNo] = convertCell( rowAsStrings[colNo], types[colNo] );
@@ -109,6 +109,7 @@ public class ResultSetMarshaller {
         return fmt.parse( value.replace( 'T', '.' ) );
       } catch ( ParseException e ) {
         // TODO log this
+        value = null;
       }
     }
     // TODO calendars
