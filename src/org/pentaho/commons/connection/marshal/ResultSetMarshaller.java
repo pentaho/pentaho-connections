@@ -109,7 +109,10 @@ public class ResultSetMarshaller {
         return fmt.parse( value.replace( 'T', '.' ) );
       } catch ( ParseException e ) {
         // TODO log this
-        value = null;
+        // this is kind of bogus - caller is likely expecting a date, not string. But this would be a behavior change to
+        // error out
+
+        return value;
       }
     }
     // TODO calendars

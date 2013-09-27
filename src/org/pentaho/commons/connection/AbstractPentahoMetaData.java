@@ -105,6 +105,8 @@ public abstract class AbstractPentahoMetaData implements IPentahoMetaData {
    * (non-Javadoc)
    * 
    * @see org.pentaho.connection.IPentahoMetaData#getRowHeaders()
+   * 
+   * @deprecated
    */
   public abstract Object[][] getRowHeaders();
 
