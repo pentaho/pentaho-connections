@@ -15,12 +15,15 @@ package org.pentaho.commons.connection.marshal;
 
 import java.io.Serializable;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * This object stores the names of the columns in a MarshallableResultSet.
  * 
  * @author jamesdixon
  * 
  */
+@XmlRootElement
 public class MarshallableColumnNames implements Serializable {
 
   private static final long serialVersionUID = -1224364938886117109L;

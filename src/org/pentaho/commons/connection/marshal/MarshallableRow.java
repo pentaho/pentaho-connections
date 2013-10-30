@@ -17,6 +17,8 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.pentaho.commons.connection.IPentahoDataTypes;
 
 /**
@@ -25,6 +27,7 @@ import org.pentaho.commons.connection.IPentahoDataTypes;
  * @author jamesdixon
  * 
  */
+@XmlRootElement
 public class MarshallableRow implements Serializable {
 
   private static final long serialVersionUID = 3397670591600236990L;
