@@ -17,6 +17,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.pentaho.commons.connection.IPentahoDataTypes;
 import org.pentaho.commons.connection.IPentahoMetaData;
 import org.pentaho.commons.connection.IPentahoResultSet;
@@ -28,6 +30,7 @@ import org.pentaho.commons.connection.IPentahoResultSet;
  * @author jamesdixon
  * 
  */
+@XmlRootElement
 public class MarshallableResultSet implements Serializable {
 
   private static final long serialVersionUID = 3272001968807944367L;

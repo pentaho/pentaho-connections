@@ -19,6 +19,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.pentaho.commons.connection.IPentahoDataTypes;
 
 /**
@@ -28,6 +30,7 @@ import org.pentaho.commons.connection.IPentahoDataTypes;
  * @author jamesdixon
  * 
  */
+@XmlRootElement
 public class MarshallableColumnTypes implements Serializable {
 
   private static final long serialVersionUID = -5961847338607421411L;
