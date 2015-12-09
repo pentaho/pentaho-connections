@@ -16,21 +16,27 @@
  */
 package org.pentaho.commons.connection.memory;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import junit.framework.TestCase;
 
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
+import org.junit.Test;
 import org.pentaho.commons.connection.IPentahoMetaData;
 
 @SuppressWarnings( { "all" } )
-public class MemoryResultSetTest extends TestCase {
+public class MemoryResultSetTest {
 
+  @Test
   public void testMetadata1() {
-
     List columnNames = new ArrayList();
     columnNames.add( "col1" );
     columnNames.add( "col2" );
@@ -60,6 +66,7 @@ public class MemoryResultSetTest extends TestCase {
     assertEquals( -1, metadata.getColumnIndex( "bogus" ) );
   }
 
+  @Test
   public void testMetadata2() {
 
     String[][] colHeaders = new String[][] { { "col1", "col2" } };
@@ -90,6 +97,7 @@ public class MemoryResultSetTest extends TestCase {
 
   }
 
+  @Test
   public void testNullMetadata() {
 
     MemoryMetaData metadata = new MemoryMetaData( null, null );
@@ -105,6 +113,7 @@ public class MemoryResultSetTest extends TestCase {
     assertEquals( -1, metadata.getColumnIndex( new String[] { "col1" } ) );
   }
 
+  @Test
   public void testConstructor1() {
 
     MemoryResultSet data = new MemoryResultSet();
@@ -122,6 +131,7 @@ public class MemoryResultSetTest extends TestCase {
     assertEquals( 2, data.getColumnCount() );
   }
 
+  @Test
   public void testConstructor2() {
 
     MemoryMetaData metadata = new MemoryMetaData( new String[][] { { "col1", "col2" } }, null );
@@ -132,6 +142,7 @@ public class MemoryResultSetTest extends TestCase {
 
   }
 
+  @Test
   public void testAddRow() {
 
     MemoryMetaData metadata = new MemoryMetaData( new String[][] { { "col1", "col2" } }, null );
@@ -152,6 +163,7 @@ public class MemoryResultSetTest extends TestCase {
 
   }
 
+  @Test
   public void testSetRows() {
 
     MemoryMetaData metadata = new MemoryMetaData( new String[][] { { "col1", "col2" } }, null );
@@ -166,6 +178,7 @@ public class MemoryResultSetTest extends TestCase {
 
     data.setRows( rows );
 
+    assertNotNull( data.getRows() );
     assertEquals( 3, data.getRowCount() );
     assertEquals( "a", data.getValueAt( 0, 0 ) );
     assertEquals( 1, data.getValueAt( 0, 1 ) );
@@ -176,6 +189,7 @@ public class MemoryResultSetTest extends TestCase {
 
   }
 
+  @Test
   public void testIterators() {
 
     MemoryMetaData metadata = new MemoryMetaData( new String[][] { { "col1", "col2" } }, null );
@@ -229,6 +243,7 @@ public class MemoryResultSetTest extends TestCase {
 
   }
 
+  @Test
   public void testGetDataColumn() {
 
     MemoryMetaData metadata = new MemoryMetaData( new String[][] { { "col1", "col2" } }, null );
@@ -252,6 +267,7 @@ public class MemoryResultSetTest extends TestCase {
     assertEquals( 3, col[2] );
   }
 
+  @Test
   public void testGetDataRow() {
 
     MemoryMetaData metadata = new MemoryMetaData( new String[][] { { "col1", "col2" } }, null );
@@ -276,6 +292,7 @@ public class MemoryResultSetTest extends TestCase {
     assertNull( data.getDataRow( 99 ) );
   }
 
+  @Test
   public void testPeek() {
 
     MemoryMetaData metadata = new MemoryMetaData( new String[][] { { "col1", "col2" } }, null );
@@ -345,6 +362,7 @@ public class MemoryResultSetTest extends TestCase {
 
   }
 
+  @Test
   public void testPeekFlattened1() {
 
     MemoryMetaData metadata =
@@ -438,6 +456,7 @@ public class MemoryResultSetTest extends TestCase {
 
   }
 
+  @Test
   public void testPeekFlattened2() {
 
     // test that the flattened next() and peek() work like the regular ones
@@ -509,6 +528,7 @@ public class MemoryResultSetTest extends TestCase {
 
   }
 
+  @Test
   public void testPeekFlattened3() {
 
     // test what happens when there are fewer row headers than rows
@@ -597,6 +617,7 @@ public class MemoryResultSetTest extends TestCase {
 
   }
 
+  @Test
   public void testColumnNames1() {
 
     MemoryMetaData metadata =
@@ -623,6 +644,7 @@ public class MemoryResultSetTest extends TestCase {
 
   }
 
+  @Test
   public void testColumnNames2() {
 
     MemoryMetaData metadata =
@@ -655,6 +677,7 @@ public class MemoryResultSetTest extends TestCase {
 
   }
 
+  @Test
   public void testCreateList() {
 
     List items = new ArrayList();
@@ -678,6 +701,7 @@ public class MemoryResultSetTest extends TestCase {
 
   }
 
+  @Test
   public void testCreateFromArrays() {
 
     MemoryResultSet data =
@@ -704,6 +728,7 @@ public class MemoryResultSetTest extends TestCase {
 
   }
 
+  @Test
   public void testCreateFromLists() {
 
     List colHeaders = new ArrayList();
@@ -746,10 +771,20 @@ public class MemoryResultSetTest extends TestCase {
 
   }
 
-  public void testCopy() {
-
+  @Test
+  public void testMemoryCopy() {
     MemoryMetaData metadata = new MemoryMetaData( new String[][] { { "col1", "col2" } }, null );
+    testCopyMetadata( metadata );
+  }
 
+  @Test
+  public void testMemoryCopyNonMemmoryMetadata() {
+    IPentahoMetaData metadata = mock( IPentahoMetaData.class );
+    when( metadata.getColumnHeaders() ).thenReturn( new String[][] { { "col1", "col2" } } );
+    testCopyMetadata( metadata );
+  }
+
+  private void testCopyMetadata( IPentahoMetaData metadata ) {
     MemoryResultSet data1 = new MemoryResultSet( metadata );
 
     data1.addRow( new Object[] { "a", new Integer( 1 ) } );
@@ -775,9 +810,9 @@ public class MemoryResultSetTest extends TestCase {
     assertEquals( 2, data.getValueAt( 1, 1 ) );
     assertEquals( "c", data.getValueAt( 2, 0 ) );
     assertEquals( 3, data.getValueAt( 2, 1 ) );
-
   }
 
+  @Test
   public void testCreateFromNode() throws Exception {
 
     StringBuilder sb = new StringBuilder();

@@ -21,7 +21,8 @@
         </dependency>
 
         <!--  testing dependencies -->        
-        <dependency org="junit"               name="junit"               rev="4.4" conf="test->default"/>
+        <dependency org="junit"            name="junit"            rev="4.12"     transitive="false" conf="test->default"/>
+        <dependency org="org.mockito"      name="mockito-all"      rev="1.9.5"    transitive="false" conf="test->default"/>
 	    <dependency org="jaxen" name="jaxen" rev="1.1" transitive="false" conf="test->default"/>
     </dependencies>
 </ivy-module>

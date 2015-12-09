@@ -36,11 +36,32 @@ public class MemoryMetaData extends AbstractPentahoMetaData implements IMultiDim
 
   protected String columnNameFormatStr; // format mask to use to generate the columnNames
 
+  public MemoryMetaData( Object[][] columnHeaders, Object[][] rowHeaders, String columnNameFormatStr,
+      String[] columnTypes, String[] columnNames, String[] rowHeaderNames  ) {
+    this.columnHeaders = columnHeaders;
+    this.rowHeaders = rowHeaders;
+    this.columnNameFormatStr = columnNameFormatStr;
+    this.columnTypes = columnTypes;
+    this.columnNames = columnNames;
+    this.rowHeaderNames = rowHeaderNames;
+  }
+
+  public MemoryMetaData( MemoryMetaData metaData ) {
+    this.columnHeaders = metaData.getColumnHeaders();
+    this.rowHeaders = metaData.getRowHeaders();
+    this.columnNameFormatStr = metaData.getColumnNameFormat();
+    this.columnTypes = metaData.getColumnTypes();
+    this.columnNames = metaData.getFlattenedColumnNames();
+    this.rowHeaderNames = metaData.getRowHeaderNames();
+  }
+
+  @Deprecated
   public MemoryMetaData( Object[][] columnHeaders, Object[][] rowHeaders ) {
     this.columnHeaders = columnHeaders;
     this.rowHeaders = rowHeaders;
   }
 
+  @Deprecated
   @SuppressWarnings( "rawtypes" )
   public MemoryMetaData( List columnHeadersList ) {
     Object[][] tmp = new String[1][columnHeadersList.size()];
@@ -104,7 +125,12 @@ public class MemoryMetaData extends AbstractPentahoMetaData implements IMultiDim
     this.columnNameFormatStr = formatStr;
   }
 
+  public String getColumnNameFormat() {
+    return columnNameFormatStr;
+  }
+
   public void generateColumnNames() {
     columnNames = MetaDataUtil.generateColumnNames( columnHeaders, rowHeaders, rowHeaderNames, columnNameFormatStr );
   }
+
 }

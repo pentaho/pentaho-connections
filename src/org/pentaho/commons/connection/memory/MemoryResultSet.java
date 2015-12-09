@@ -59,6 +59,10 @@ public class MemoryResultSet implements IPentahoResultSet, IPeekable, IMultiDime
     rowIndex = 0;
   }
 
+  public List getRows() {
+    return this.rows;
+  }
+
   public int addRow( Object[] row ) {
     rows.add( row );
     return rows.size() - 1;
@@ -224,12 +228,21 @@ public class MemoryResultSet implements IPentahoResultSet, IPeekable, IMultiDime
     return metaData.getColumnCount();
   }
 
+  /**
+   * <b>Attention: </b> It does not clone data!
+   * @return new instance the {@link MemoryResultSet} 
+   */
   public IPentahoResultSet memoryCopy() {
     try {
-      IPentahoMetaData metadata = getMetaData();
-      Object[][] columnHeaders = metadata.getColumnHeaders();
+      IPentahoMetaData cachedMetaData = null;
 
-      MemoryMetaData cachedMetaData = new MemoryMetaData( columnHeaders, null );
+      if ( getMetaData() instanceof MemoryMetaData ) {
+        cachedMetaData = new MemoryMetaData( (MemoryMetaData) getMetaData() );
+      } else {
+        IPentahoMetaData metadata = getMetaData();
+        cachedMetaData = new MemoryMetaData( metadata.getColumnHeaders(), null );
+      }
+
       MemoryResultSet cachedResultSet = new MemoryResultSet( cachedMetaData );
 
       Object[] rowObjects = next();
