@@ -778,9 +778,10 @@ public class MemoryResultSetTest {
   }
 
   @Test
-  public void testMemoryCopyNonMemmoryMetadata() {
+  public void testMemoryCopyIPentahoMetaData() {
     IPentahoMetaData metadata = mock( IPentahoMetaData.class );
     when( metadata.getColumnHeaders() ).thenReturn( new String[][] { { "col1", "col2" } } );
+    when( metadata.getColumnCount() ).thenReturn( 2 );
     testCopyMetadata( metadata );
   }
 
