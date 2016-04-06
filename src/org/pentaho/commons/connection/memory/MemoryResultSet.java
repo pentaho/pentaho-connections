@@ -229,21 +229,16 @@ public class MemoryResultSet implements IPentahoResultSet, IPeekable, IMultiDime
   }
 
   /**
-   * <b>Attention: </b> It does not clone data!
-   * @return new instance the {@link MemoryResultSet} 
+   * <b>Attention: </b> It does not clone data!  It is create the shallow copy of metadata! 
+   * It is create the shallow copy of data. You must avoid to use this method. 
+   * @return new instance the {@link MemoryResultSet} with same metadata
    */
   public IPentahoResultSet memoryCopy() {
     try {
-      IPentahoMetaData cachedMetaData = null;
-
-      if ( getMetaData() instanceof MemoryMetaData ) {
-        cachedMetaData = new MemoryMetaData( (MemoryMetaData) getMetaData() );
-      } else {
-        IPentahoMetaData metadata = getMetaData();
-        cachedMetaData = new MemoryMetaData( metadata.getColumnHeaders(), null );
-      }
-
-      MemoryResultSet cachedResultSet = new MemoryResultSet( cachedMetaData );
+      // we have the {@link #setMetaData(IPentahoMetaData)} so the metadata can be any 
+      // class which implements IPentahoMetaData, we should not lost data from metadata, so we must use metadata from original result set,
+      // or clone metadata. The IPentahoMetaData does not implement Cloneable and we unable to clone data. So keep the shallow copy of metadata.
+      MemoryResultSet cachedResultSet = new MemoryResultSet( getMetaData() );
 
       Object[] rowObjects = next();
       while ( rowObjects != null ) {
