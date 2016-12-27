@@ -1,5 +1,5 @@
 /*
- * Copyright 2002 - 2013 Pentaho Corporation.  All rights reserved.
+ * Copyright 2002 - 2016 Pentaho Corporation.  All rights reserved.
  * 
  * This software was developed by Pentaho Corporation and is provided under the terms
  * of the Mozilla Public License, Version 1.1, or any later version. You may not use
@@ -79,6 +79,11 @@ public interface IPentahoConnection {
    * Standard key to use for a connection property.
    */
   public static final String CONNECTION = "connection"; //$NON-NLS-1$
+
+  /**
+   * Standard key to use for a connection's name property.
+   */
+  public static final String CONNECTION_NAME = "connection_name"; //$NON-NLS-1$
 
   /**
    * Standard key to use for a provider property.
