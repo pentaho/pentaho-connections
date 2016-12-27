@@ -84,6 +84,11 @@ public interface IPentahoConnection {
   public static final String CONNECTION = "connection"; //$NON-NLS-1$
 
   /**
+   * Standard key to use for a connection's name property.
+   */
+  public static final String CONNECTION_NAME = "connection_name"; //$NON-NLS-1$
+
+  /**
    * Standard key to use for a provider property.
    */
   public static final String PROVIDER = "provider"; //$NON-NLS-1$
