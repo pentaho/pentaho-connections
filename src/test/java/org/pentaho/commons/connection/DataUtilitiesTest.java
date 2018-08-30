@@ -12,7 +12,7 @@
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details.
  *
- * Copyright (c) 2002-2016 Pentaho Corporation..  All rights reserved.
+ * Copyright (c) 2002-2018 Hitachi Vantara..  All rights reserved.
  */
 package org.pentaho.commons.connection;
 
@@ -76,15 +76,15 @@ public class DataUtilitiesTest {
   @Test
   public void testGetXMLString() {
     Object[][] data = new String[][]{ {"one-one", "one-two", "one-three" }, { "two-one", "two-two", "two-three" } };
-    Object[][] columnHeaders = new String[][] { {"col 1-1", "col 1-2", "col 1-3"},
+    Object[][] columnHeaders = new String[][] { {"col-1-1", "col-1-2", "col-1-3"},
       { "col 2-1", "col 2-2", "col 2-3" } };
-    Object[][] rowHeaders = new String[][] { {"row 1-1", "row 1-2", "row 1-3"}, { "row 2-1", "row 2-2", "row 2-3" } };
+    Object[][] rowHeaders = new String[][] { {"row-1-1", "row-1-2", "row-1-3"}, { "row-2-1", "row-2-2", "row-2-3" } };
     MemoryMetaData metaData = new MemoryMetaData( columnHeaders, rowHeaders );
     MemoryResultSet mrs = new MemoryResultSet( metaData );
     mrs.addRow( data[0] );
     mrs.addRow( data[1] );
     String xml = DataUtilities.getXMLString( mrs );
-    assertTrue( xml.indexOf( "<col 1-1>one-one</col 1-1>" ) > 0 );
-    assertTrue( xml.indexOf( "<col 1-3>two-three</col 1-3>" ) > 0 );
+    assertTrue( xml.indexOf( "<col-1-1>one-one</col-1-1>" ) > 0 );
+    assertTrue( xml.indexOf( "<col-1-3>two-three</col-1-3>" ) > 0 );
   }
 }
