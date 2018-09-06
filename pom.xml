@@ -5,12 +5,11 @@
   <parent>
     <groupId>org.pentaho</groupId>
     <artifactId>pentaho-ce-jar-parent-pom</artifactId>
-    <version>7.1-SNAPSHOT</version>
+    <version>7.1.0.16-160</version>
   </parent>
   <groupId>pentaho</groupId>
   <artifactId>pentaho-connections</artifactId>
-  <version>7.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <version>7.1.0.16-160</version>
   <name>Pentaho Commons Connections</name>
   <description>The Pentaho Connections API defines a common set of interfaces for dealing with connections and result sets.</description>
   <url>http://www.pentaho.com</url>
@@ -22,9 +21,9 @@
   <properties>
     <commons-collections.version>3.2.2</commons-collections.version>
     <dom4j.version>1.6.1</dom4j.version>
-    <junit.version>4.4</junit.version>
-    <mockito-all.version>1.9.5</mockito-all.version>
     <jaxen.version>1.1</jaxen.version>
+    <mockito-all.version>1.9.5</mockito-all.version>
+    <junit.version>4.4</junit.version>
   </properties>
   <dependencies>
     <dependency>
@@ -33,8 +32,8 @@
       <version>${commons-collections.version}</version>
       <exclusions>
         <exclusion>
-          <groupId>*</groupId>
           <artifactId>*</artifactId>
+          <groupId>*</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -44,8 +43,8 @@
       <version>${dom4j.version}</version>
       <exclusions>
         <exclusion>
-          <groupId>xml-apis</groupId>
           <artifactId>*</artifactId>
+          <groupId>xml-apis</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -68,9 +67,5 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-
-  </build>
-  <profiles>
-  </profiles>
+  <build />
 </project>
