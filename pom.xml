@@ -21,10 +21,8 @@
   </scm>
   <properties>
     <commons-collections.version>3.2.2</commons-collections.version>
-    <dom4j.version>1.6.1</dom4j.version>
     <junit.version>4.4</junit.version>
     <mockito-all.version>1.9.5</mockito-all.version>
-    <jaxen.version>1.1</jaxen.version>
   </properties>
   <dependencies>
     <dependency>
@@ -39,15 +37,8 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>dom4j</groupId>
+      <groupId>org.dom4j</groupId>
       <artifactId>dom4j</artifactId>
-      <version>${dom4j.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>xml-apis</groupId>
-          <artifactId>*</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -61,10 +52,10 @@
       <version>${mockito-all.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- required by org.dom4j -->
     <dependency>
       <groupId>jaxen</groupId>
       <artifactId>jaxen</artifactId>
-      <version>${jaxen.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
