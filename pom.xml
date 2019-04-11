@@ -5,12 +5,11 @@
   <parent>
     <groupId>org.pentaho</groupId>
     <artifactId>pentaho-ce-jar-parent-pom</artifactId>
-    <version>7.1-SNAPSHOT</version>
+    <version>7.1.0.23-197</version>
   </parent>
   <groupId>pentaho</groupId>
   <artifactId>pentaho-connections</artifactId>
-  <version>7.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <version>7.1.0.23-197</version>
   <name>Pentaho Commons Connections</name>
   <description>The Pentaho Connections API defines a common set of interfaces for dealing with connections and result sets.</description>
   <url>http://www.pentaho.com</url>
@@ -21,8 +20,8 @@
   </scm>
   <properties>
     <commons-collections.version>3.2.2</commons-collections.version>
-    <junit.version>4.4</junit.version>
     <mockito-all.version>1.9.5</mockito-all.version>
+    <junit.version>4.4</junit.version>
   </properties>
   <dependencies>
     <dependency>
@@ -31,8 +30,8 @@
       <version>${commons-collections.version}</version>
       <exclusions>
         <exclusion>
-          <groupId>*</groupId>
           <artifactId>*</artifactId>
+          <groupId>*</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -52,16 +51,11 @@
       <version>${mockito-all.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- required by org.dom4j -->
     <dependency>
       <groupId>jaxen</groupId>
       <artifactId>jaxen</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-
-  </build>
-  <profiles>
-  </profiles>
+  <build />
 </project>
