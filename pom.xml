@@ -5,11 +5,11 @@
   <parent>
     <groupId>org.pentaho</groupId>
     <artifactId>pentaho-ce-jar-parent-pom</artifactId>
-    <version>9.3.0.0-SNAPSHOT</version>
+    <version>9.3.0.0-393</version>
   </parent>
   <groupId>pentaho</groupId>
   <artifactId>pentaho-connections</artifactId>
-  <version>9.3.0.0-SNAPSHOT</version>
+  <version>9.3.0.0-393</version>
   <name>Pentaho Commons Connections</name>
   <description>The Pentaho Connections API defines a common set of interfaces for dealing with connections and result sets.</description>
   <url>http://www.pentaho.com</url>
