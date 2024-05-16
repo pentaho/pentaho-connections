@@ -12,7 +12,7 @@
  * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details.
  *
- * Copyright (c) 2002-2017 Hitachi Vantara..  All rights reserved.
+ * Copyright (c) 2002-2024 Hitachi Vantara..  All rights reserved.
  */
 package org.pentaho.commons.connection.marshal;
 
@@ -37,9 +37,9 @@ public class MarshallableResultSetTest extends TestCase {
 
     MemoryResultSet data = new MemoryResultSet( metadata );
 
-    data.addRow( new Object[] { "a", new Integer( 1 ) } );
-    data.addRow( new Object[] { "b", new Integer( 2 ) } );
-    data.addRow( new Object[] { "c", new Integer( 3 ) } );
+    data.addRow( new Object[] { "a", Integer.valueOf( 1 ) } );
+    data.addRow( new Object[] { "b", Integer.valueOf( 2 ) } );
+    data.addRow( new Object[] { "c", Integer.valueOf( 3 ) } );
 
     MarshallableResultSet result = new MarshallableResultSet();
     result.setResultSet( data );
@@ -67,11 +67,11 @@ public class MarshallableResultSetTest extends TestCase {
     MemoryMetaData metadata = new MemoryMetaData( mdStrings, null );
     MemoryResultSet data = new MemoryResultSet( metadata );
 
-    data.addRow( new Object[] { "apple", 1, new Long( Integer.MAX_VALUE + 1 ), true, new BigDecimal( "10.99" ),
-      new Date( 98, 1, 14 ), null, new Double( 123.45 ), null } );
-    data.addRow( new Object[] { "banana", 20, new Long( Integer.MIN_VALUE - 1 ), false,
-      new BigDecimal( "1000000000000.99" ), new Date( 109, 1, 4 ), new Float( 99.9 ), null, null } );
-    data.addRow( new Object[] { "", 333, (long) 0, true, null, null, new Float( 99.9 ), new Double( 123.45 ), null } );
+    data.addRow( new Object[] { "apple", 1, Long.valueOf( Integer.MAX_VALUE + 1 ), true, new BigDecimal( "10.99" ),
+      new Date( 98, 1, 14 ), null, Double.valueOf( 123.45 ), null } );
+    data.addRow( new Object[] { "banana", 20, Long.valueOf( Integer.MIN_VALUE - 1 ), false,
+      new BigDecimal( "1000000000000.99" ), new Date( 109, 1, 4 ), Float.valueOf( 99.9f ), null, null } );
+    data.addRow( new Object[] { "", 333, (long) 0, true, null, null, Float.valueOf( 99.9f ), Double.valueOf( 123.45 ), null } );
 
     MarshallableResultSet wsData = ResultSetMarshaller.fromResultSet( data );
 
@@ -95,7 +95,7 @@ public class MarshallableResultSetTest extends TestCase {
     Object[] row = result.next();
     assertEquals( "apple", row[0] );
     assertEquals( 1, row[1] );
-    assertEquals( new Long( Integer.MAX_VALUE + 1 ), row[2] );
+    assertEquals( Long.valueOf( Integer.MAX_VALUE + 1 ), row[2] );
     assertEquals( true, row[3] );
     assertEquals( new BigDecimal( "10.99" ), row[4] );
     assertEquals( new Date( 98, 1, 14 ), row[5] );
@@ -113,7 +113,7 @@ public class MarshallableResultSetTest extends TestCase {
     row = result.next();
     assertEquals( "banana", row[0] );
     assertEquals( 20, row[1] );
-    assertEquals( new Long( Integer.MIN_VALUE - 1 ), row[2] );
+    assertEquals( Long.valueOf( Integer.MIN_VALUE - 1 ), row[2] );
     assertEquals( false, row[3] );
     assertEquals( new BigDecimal( "1000000000000.99" ), row[4] );
     assertEquals( new Date( 109, 1, 4 ), row[5] );
@@ -131,7 +131,7 @@ public class MarshallableResultSetTest extends TestCase {
     row = result.next();
     assertEquals( "", row[0] );
     assertEquals( 333, row[1] );
-    assertEquals( new Long( 0 ), row[2] );
+    assertEquals( Long.valueOf( 0 ), row[2] );
     assertEquals( true, row[3] );
     assertEquals( null, row[4] );
     assertEquals( null, row[5] );
