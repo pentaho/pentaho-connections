@@ -20,8 +20,11 @@
   </scm>
   <properties>
     <commons-collections.version>3.2.2</commons-collections.version>
-    <mockito-all.version>1.9.5</mockito-all.version>
-    <junit.version>4.4</junit.version>
+    <mockito.version>5.10.0</mockito.version>
+    <junit.version>4.13.2</junit.version>
+    <argLine>
+      --add-opens=java.base/java.lang=ALL-UNNAMED
+    </argLine>
   </properties>
   <dependencies>
     <dependency>
@@ -58,8 +61,8 @@
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <version>${mockito-all.version}</version>
+      <artifactId>mockito-core</artifactId>
+      <version>${mockito.version}</version>
       <scope>test</scope>
     </dependency>
     <!-- required by org.dom4j -->
