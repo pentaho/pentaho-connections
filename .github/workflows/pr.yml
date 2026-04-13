@@ -68,6 +68,9 @@ jobs:
         - /home/runner/caches/pentaho/.m2:/root/.m2
     
     env:
+      ARTIFACTORY_HOST: https://${{ vars.ARTIFACTORY_HOST }}
+      ARTIFACTORY_BASE_URL: ${{ format('https://{0}/artifactory', vars.ARTIFACTORY_HOST) }}
+      RESOLVE_REPO_MIRROR: ${{ format('https://{0}/artifactory/pnt-mvn', vars.ARTIFACTORY_HOST) }}
       NEXUS_DEPLOY_USER: ${{ secrets.PENTAHO_CICD_ONE_USER }}
       NEXUS_DEPLOY_PASSWORD: ${{ secrets.PENTAHO_CICD_ONE_KEY }}
       SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}

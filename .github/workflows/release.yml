@@ -42,6 +42,9 @@ jobs:
       volumes:
         - /home/runner/caches/pentaho/.m2:/root/.m2
 
+    env:
+      ARTIFACTORY_HOST: https://${{ vars.ARTIFACTORY_HOST }}
+
     steps:
       - name: Checkout source repo
         uses: actions/checkout@v4
