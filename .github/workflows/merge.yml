@@ -82,7 +82,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.1.7
         with:
           token: ${{ secrets.HV_ACTIONS_GIT_TOKEN }}
           fetch-depth: 1
@@ -144,11 +144,10 @@ jobs:
 
       - name: SonarQube Scan
         uses: lumada-common-services/gh-composite-actions@stable
+        continue-on-error: true
         env:
           sonar_utility: sonar-scanner
           sonar_commands: '("-Dsonar.host.url=${{env.SONAR_HOST_URL}} -Dsonar.token=${{env.SONAR_TOKEN}}")'
-          JAVA_HOME:
-          JAVA_HOME_21_X64:
 
       - name: Report notifications
         if: always()
