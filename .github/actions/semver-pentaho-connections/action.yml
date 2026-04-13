@@ -1,0 +1,99 @@
+name: semver-pentaho-connections
+description: Manage semantic versioning for pentaho-connections
+
+inputs:
+  version-file:
+    description: 'Path to version file'
+    required: false
+    default: '.pentaho-connections-version'
+  action:
+    description: 'Action: check, bump-major, bump-minor, bump-patch, or set'
+    required: true
+  new-version:
+    description: 'Specific version when action=set'
+    required: false
+
+outputs:
+  current-version:
+    description: 'Current version'
+    value: ${{ steps.semver.outputs.current-version }}
+  new-version:
+    description: 'New version after bump'
+    value: ${{ steps.semver.outputs.new-version }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Calculate version
+      id: semver
+      shell: bash
+      env:
+        ACTION: ${{ inputs.action }}
+        NEW_VERSION_INPUT: ${{ inputs.new-version }}
+        VERSION_FILE: ${{ inputs.version-file }}
+      run: |
+        # Load current version
+        if [[ ! -f "$VERSION_FILE" ]]; then
+          CURRENT="1.0.0"
+          echo "Version file not found, using default: $CURRENT"
+        else
+          CURRENT=$(cat "$VERSION_FILE" | tr -d '\n' | tr -d ' ')
+        fi
+        
+        # Parse version
+        MAJOR=$(echo $CURRENT | cut -d. -f1)
+        MINOR=$(echo $CURRENT | cut -d. -f2)
+        PATCH=$(echo $CURRENT | cut -d. -f3)
+        
+        # Validate format
+        if ! [[ "$CURRENT" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "Error: Invalid version format: $CURRENT"
+          exit 1
+        fi
+        
+        # Calculate new version
+        case "$ACTION" in
+          check)
+            NEW=$CURRENT
+            ;;
+          bump-major)
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+            NEW="$MAJOR.$MINOR.$PATCH"
+            ;;
+          bump-minor)
+            MINOR=$((MINOR + 1))
+            PATCH=0
+            NEW="$MAJOR.$MINOR.$PATCH"
+            ;;
+          bump-patch)
+            PATCH=$((PATCH + 1))
+            NEW="$MAJOR.$MINOR.$PATCH"
+            ;;
+          set)
+            if [[ -z "$NEW_VERSION_INPUT" ]]; then
+              echo "Error: new-version required when action=set"
+              exit 1
+            fi
+            if ! [[ "$NEW_VERSION_INPUT" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "Error: Invalid version format: $NEW_VERSION_INPUT"
+              exit 1
+            fi
+            NEW=$NEW_VERSION_INPUT
+            ;;
+          *)
+            echo "Error: Unknown action: $ACTION"
+            exit 1
+            ;;
+        esac
+        
+        # Output
+        echo "current-version=$CURRENT" >> $GITHUB_OUTPUT
+        echo "new-version=$NEW" >> $GITHUB_OUTPUT
+        
+        # Update file if not just checking
+        if [[ "$ACTION" != "check" ]]; then
+          echo "$NEW" > "$VERSION_FILE"
+          echo "Updated $VERSION_FILE to $NEW"
+        fi

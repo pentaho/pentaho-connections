@@ -1,0 +1,84 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version"
+        required: true
+        type: string
+
+env:
+  ARTIFACTORY_HOST: https://${{ vars.ARTIFACTORY_HOST }}
+  ARTIFACTORY_BASE_URL: ${ARTIFACTORY_HOST}/artifactory
+
+jobs:
+  merge-workflow:
+    uses: ./.github/workflows/merge.yml
+    with:
+      artifactVersion: ${{ inputs.version }}
+      actualRelease: "true"
+    secrets: inherit
+
+  release:
+    needs: merge-workflow
+    uses: pentaho/actions-common/.github/workflows/release.yml@stable
+    with:
+      release_version: ${{ inputs.version }}
+      dry_run: false
+    secrets: inherit
+
+  bump-version:
+    needs: merge-workflow
+    runs-on: [orl-lab]
+    container:
+      image: ${{ vars.ARTIFACTORY_HOST }}/devops-docker-release/pentaho/actions-common:jdk21-20250717.225
+      credentials:
+        username: ${{ secrets.PENTAHO_CICD_ONE_USER }}
+        password: ${{ secrets.PENTAHO_CICD_ONE_KEY }}
+      volumes:
+        - /home/runner/caches/pentaho/.m2:/root/.m2
+
+    steps:
+      - name: Retrieve settings file
+        id: common-maven
+        uses: pentaho/actions-common@stable
+
+      - name: Copy settings.xml to .m2 directory
+        shell: sh
+        run: |
+          cp "${{ steps.common-maven.outputs.settings-file-path }}" /root/.m2
+
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+
+      - name: Increment patch version
+        id: increment-version
+        shell: bash
+        run: |
+          base_version=${{ inputs.version }}
+
+          # Split into array
+          IFS='.' read -r -a parts <<< "$base_version"
+          last_index=$((${#parts[@]} - 1))
+          parts[$last_index]=$((parts[$last_index] + 1))
+
+          # Reconstruct version, joining the parts by dots
+          new_version=$(IFS='.'; echo "${parts[*]}")
+
+          # Reattach the -SNAPSHOT suffix
+          new_version="$new_version-SNAPSHOT"
+
+          echo "New version: $new_version"
+          echo "new_version=$new_version" >> $GITHUB_OUTPUT
+
+      - name: Update Maven version
+        run: mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${{ steps.increment-version.outputs.new_version }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          title: "chore: bump pentaho-connections version"
+          commit-message: "chore: bump pentaho-connections version"
+          branch: bump-version-release
+          delete-branch: true

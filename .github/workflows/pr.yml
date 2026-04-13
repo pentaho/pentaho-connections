@@ -1,0 +1,109 @@
+name: Pull Request
+
+on:
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  ARTIFACTORY_HOST: https://${{ vars.ARTIFACTORY_HOST }}
+  ARTIFACTORY_BASE_URL: ${ARTIFACTORY_HOST}/artifactory
+  RESOLVE_REPO_MIRROR: ${ARTIFACTORY_BASE_URL}/pnt-mvn
+  NEXUS_DEPLOY_USER: ${{ secrets.PENTAHO_CICD_ONE_USER }}
+  NEXUS_DEPLOY_PASSWORD: ${{ secrets.PENTAHO_CICD_ONE_KEY }}
+  SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+  SONAR_TOKEN: ${{ secrets.WINGMAN_SONAR_TOKEN }}
+  SLACK_CHANNEL: yoda-prs
+
+jobs:
+  check-commit-message:
+    name: Check Commits
+    runs-on: [orl-lab]
+    steps:
+      - name: Check message against regex
+        uses: gsactions/commit-message-checker@v2
+        with:
+          pattern: '(?:feat|fix|perf|revert|docs|style|chore|refactor|test|build|ci|improvement)(?:\([a-zA-Z_0-9-]+\))?:\s[a-z]{1,2}.+'
+          error: "The commit message must follow the conventional commits specification"
+          excludeDescription: "true"
+          excludeTitle: "true"
+          checkAllCommitMessages: "true"
+          accessToken: ${{ secrets.GITHUB_TOKEN }}
+
+  setup-maven-settings:
+    name: Setup Maven settings
+    runs-on: [orl-lab]
+    container:
+      image: ${{ vars.ARTIFACTORY_HOST }}/devops-docker-release/pentaho/actions-common:jdk21-20250717.225
+      credentials:
+        username: ${{ secrets.PENTAHO_CICD_ONE_USER }}
+        password: ${{ secrets.PENTAHO_CICD_ONE_KEY }}
+      volumes:
+        - /home/runner/caches/pentaho/.m2:/root/.m2
+    steps:
+      - name: Retrieve settings file
+        id: common-maven
+        uses: pentaho/actions-common@stable
+
+      - name: Copy settings.xml to .m2 directory
+        shell: sh
+        run: |
+          cp "${{ steps.common-maven.outputs.settings-file-path }}" /root/.m2
+
+  build-and-test:
+    name: Build & Test
+    needs: setup-maven-settings
+    runs-on: [orl-lab]
+    permissions:
+      statuses: write
+      checks: write
+      contents: write
+      pull-requests: write
+
+    container:
+      image: ${{ vars.ARTIFACTORY_HOST }}/devops-docker-release/pentaho/actions-common:jdk21-20250717.225
+      credentials:
+        username: ${{ secrets.PENTAHO_CICD_ONE_USER }}
+        password: ${{ secrets.PENTAHO_CICD_ONE_KEY }}
+      volumes:
+        - /home/runner/caches/pentaho/.m2:/root/.m2
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Safe dir
+        run: git config --global --add safe.directory $GITHUB_WORKSPACE
+
+      - name: Build & Test
+        uses: lumada-common-services/gh-composite-actions@stable
+        with:
+          command: |
+            mvn clean verify \
+            -Dmaven-surefire-plugin.testFailureIgnore=true \
+            -Daudit
+        env:
+          cmd_type: "BUILD,UNIT_TEST"
+          unit_test_reporter: "java-junit"
+          unit_test_fail_on_error: "true"
+          unit_test_report_path: "**/target/surefire-reports/*.xml"
+
+      - name: SonarQube Scan
+        uses: lumada-common-services/gh-composite-actions@stable
+        env:
+          sonar_utility: sonar-scanner
+          sonar_commands: '("-Dsonar.host.url=${{env.SONAR_HOST_URL}} -Dsonar.token=${{env.SONAR_TOKEN}} -Dsonar.pullrequest.key=${{github.event.number}} -Dsonar.pullrequest.branch=${{github.event.pull_request.head.ref}} -Dsonar.pullrequest.base=${{github.event.pull_request.base.ref}}")'
+
+      - name: Slack Notification
+        if: failure()
+        uses: lumada-common-services/gh-composite-actions@stable
+        env:
+          Slack_Token: ${{ secrets.SLACK_TOKEN }}
+          Slack_Channel: ${{ env.SLACK_CHANNEL }}
+          report: true
