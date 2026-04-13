@@ -147,7 +147,7 @@ jobs:
         continue-on-error: true
         env:
           sonar_utility: sonar-scanner
-          sonar_commands: '("-Dsonar.host.url=${{env.SONAR_HOST_URL}} -Dsonar.token=${{env.SONAR_TOKEN}}")'
+          sonar_commands: '("-Dsonar.projectKey=pentaho:pentaho-connections -Dsonar.host.url=${{env.SONAR_HOST_URL}} -Dsonar.token=${{env.SONAR_TOKEN}}")'
 
       - name: Report notifications
         if: always()

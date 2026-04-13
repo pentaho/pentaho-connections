@@ -101,7 +101,7 @@ jobs:
         uses: lumada-common-services/gh-composite-actions@stable
         env:
           sonar_utility: sonar-scanner
-          sonar_commands: '("-Dsonar.host.url=${{env.SONAR_HOST_URL}} -Dsonar.token=${{env.SONAR_TOKEN}} -Dsonar.pullrequest.key=${{github.event.number}} -Dsonar.pullrequest.branch=${{github.event.pull_request.head.ref}} -Dsonar.pullrequest.base=${{github.event.pull_request.base.ref}}")'
+          sonar_commands: '("-Dsonar.projectKey=pentaho:pentaho-connections -Dsonar.host.url=${{env.SONAR_HOST_URL}} -Dsonar.token=${{env.SONAR_TOKEN}} -Dsonar.pullrequest.key=${{github.event.number}} -Dsonar.pullrequest.branch=${{github.event.pull_request.head.ref}} -Dsonar.pullrequest.base=${{github.event.pull_request.base.ref}}")'
 
       - name: Slack Notification
         if: failure()
