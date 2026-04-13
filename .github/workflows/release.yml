@@ -47,7 +47,7 @@ jobs:
 
     steps:
       - name: Checkout source repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.1.7
 
       - name: Increment patch version
         id: increment-version
