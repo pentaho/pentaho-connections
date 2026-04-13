@@ -1,0 +1,190 @@
+name: Merge
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      artifactVersion:
+        description: "Artifact Version"
+        required: true
+        default: ""
+        type: string
+      actualRelease:
+        description: "Indicates if this is an actual release"
+        required: true
+        default: "true"
+        type: string
+
+concurrency:
+  group: merge
+  cancel-in-progress: true
+
+env:
+  ARTIFACTORY_HOST: https://${{ vars.ARTIFACTORY_HOST }}
+  SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+  SLACK_CHANNEL: yoda-prs
+  ACTUAL_RELEASE: ${{ inputs.actualRelease || 'false' }}
+
+jobs:
+  deploy-release-candidate:
+    name: Deploy Release Candidate
+    runs-on: [orl-lab]
+    container:
+      image: ${{ vars.ARTIFACTORY_HOST }}/devops-docker-release/pentaho/actions-common:jdk21-20250717.225
+      credentials:
+        username: ${{ secrets.PENTAHO_CICD_ONE_USER }}
+        password: ${{ secrets.PENTAHO_CICD_ONE_KEY }}
+      volumes:
+        - /home/runner/caches/pentaho/.m2:/root/.m2
+
+    outputs:
+      artifact-version: ${{ steps.version.outputs.version }}
+
+    env:
+      JFROG_CLI_BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      NEXUS_DEPLOY_USER: ${{ secrets.PENTAHO_CICD_ONE_USER }}
+      NEXUS_DEPLOY_PASSWORD: ${{ secrets.PENTAHO_CICD_ONE_KEY }}
+      SONAR_TOKEN: ${{ secrets.WINGMAN_SONAR_TOKEN }}
+
+    steps:
+      - name: Retrieve settings file
+        id: common-maven
+        uses: pentaho/actions-common@stable
+
+      - name: Setup Maven settings
+        shell: sh
+        run: |
+          cp "${{ steps.common-maven.outputs.settings-file-path }}" /root/.m2
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.HV_ACTIONS_GIT_TOKEN }}
+          fetch-depth: 1
+
+      - name: Setup Maven and Java Action
+        uses: s4u/setup-maven-action@v1.19.0
+        with:
+          java-version: 21
+
+      - name: Git safe dir and set remote url
+        run: |
+          git config --global --add safe.directory $GITHUB_WORKSPACE
+          git remote set-url origin https://x-access-token:${HV_ACTIONS_GIT_TOKEN}@github.com/${{ github.repository }}
+        env:
+          HV_ACTIONS_GIT_TOKEN: ${{ secrets.HV_ACTIONS_GIT_TOKEN }}
+
+      - name: Determine version
+        id: version
+        shell: bash
+        run: |
+          version=${{ inputs.artifactVersion }}
+          build_name="${{ github.event.repository.name }}-${GITHUB_REF##*/}"
+          if [ ${{ env.ACTUAL_RELEASE }} = "false" ]; then
+            current_version=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+            base_version=${current_version%-SNAPSHOT}
+            new_version="$base_version-rc"
+            version="${new_version}.${{ github.run_number }}"
+          fi
+          echo "build_name=$build_name" >> $GITHUB_OUTPUT
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Build & Test & Deploy
+        uses: lumada-common-services/gh-composite-actions@stable
+        with:
+          command: |
+            mvn clean deploy -B \
+              -Daudit \
+              -Pcicd-release \
+              -Dbuild.name=${{ steps.version.outputs.build_name }} \
+              -Dbuild.number=${{ steps.version.outputs.version }} \
+              -DuploadReadme \
+              -fae
+        env:
+          cmd_type: "BUILD,UNIT_TEST"
+          unit_test_reporter: "java-junit"
+          unit_test_fail_on_error: "true"
+          unit_test_report_path: "**/target/surefire-reports/*.xml"
+
+      - name: Tag release
+        uses: lumada-common-services/gh-composite-actions@stable
+        env:
+          Tag_version: "${{ steps.version.outputs.version }}"
+          push_tag_only: true
+
+      - name: Create artifacts download links
+        shell: bash
+        run: |
+          echo "[Full artifacts list](${{ env.ARTIFACTORY_HOST }}/ui/builds/${{ steps.version.outputs.build_name }}/${{ steps.version.outputs.version }})" >> $GITHUB_STEP_SUMMARY
+
+      - name: SonarQube Scan
+        uses: lumada-common-services/gh-composite-actions@stable
+        env:
+          sonar_utility: sonar-scanner
+          sonar_commands: '("-Dsonar.host.url=${{env.SONAR_HOST_URL}} -Dsonar.token=${{env.SONAR_TOKEN}}")'
+          JAVA_HOME:
+          JAVA_HOME_21_X64:
+
+      - name: Report notifications
+        if: always()
+        uses: lumada-common-services/gh-composite-actions@stable
+        env:
+          Slack_Token: ${{ secrets.SLACK_TOKEN }}
+          Slack_Channel: ${{ env.SLACK_CHANNEL }}
+          report: true
+
+  bump-version:
+    name: Bump Version
+    needs: deploy-release-candidate
+    runs-on: [orl-lab]
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    container:
+      image: ${{ vars.ARTIFACTORY_HOST }}/devops-docker-release/pentaho/actions-common:jdk21-20250717.225
+      credentials:
+        username: ${{ secrets.PENTAHO_CICD_ONE_USER }}
+        password: ${{ secrets.PENTAHO_CICD_ONE_KEY }}
+      volumes:
+        - /home/runner/caches/pentaho/.m2:/root/.m2
+
+    steps:
+      - name: Retrieve settings file
+        id: common-maven
+        uses: pentaho/actions-common@stable
+
+      - name: Copy settings.xml to .m2 directory
+        shell: sh
+        run: |
+          cp "${{ steps.common-maven.outputs.settings-file-path }}" /root/.m2
+
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+
+      - name: Update pentaho-connections version
+        uses: ./.github/actions/semver-pentaho-connections
+        with:
+          action: bump-patch
+
+      - name: Increment Maven version
+        id: increment-version
+        shell: bash
+        run: |
+          base_version=$(cat .pentaho-connections-version)
+          new_version="$base_version-SNAPSHOT"
+          echo "new_version=$new_version" >> $GITHUB_OUTPUT
+
+      - name: Update Maven version
+        run: mvn versions:set -DgenerateBackupPoms=false -DnewVersion=${{ steps.increment-version.outputs.new_version }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          title: "chore: bump pentaho-connections version"
+          commit-message: "chore: bump pentaho-connections version"
+          branch: bump-version-main
+          delete-branch: true
