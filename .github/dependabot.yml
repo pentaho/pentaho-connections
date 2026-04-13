@@ -1,14 +1,7 @@
 version: 2
-registries:
-  maven-registry:
-    type: maven-repository
-    url: https://${{ vars.ARTIFACTORY_HOST }}/artifactory/pnt-mvn
-    username: ${{ secrets.PENTAHO_CICD_ONE_USER }}
-    password: ${{ secrets.PENTAHO_CICD_ONE_KEY }}
 updates:
   - package-ecosystem: "maven"
     directory: "/"
-    registries: "*"
     schedule:
       interval: "weekly"
       day: "tuesday"

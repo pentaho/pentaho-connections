@@ -11,12 +11,7 @@ concurrency:
 
 env:
   ARTIFACTORY_HOST: https://${{ vars.ARTIFACTORY_HOST }}
-  ARTIFACTORY_BASE_URL: ${ARTIFACTORY_HOST}/artifactory
-  RESOLVE_REPO_MIRROR: ${ARTIFACTORY_BASE_URL}/pnt-mvn
-  NEXUS_DEPLOY_USER: ${{ secrets.PENTAHO_CICD_ONE_USER }}
-  NEXUS_DEPLOY_PASSWORD: ${{ secrets.PENTAHO_CICD_ONE_KEY }}
   SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
-  SONAR_TOKEN: ${{ secrets.WINGMAN_SONAR_TOKEN }}
   SLACK_CHANNEL: yoda-prs
 
 jobs:
@@ -71,6 +66,12 @@ jobs:
         password: ${{ secrets.PENTAHO_CICD_ONE_KEY }}
       volumes:
         - /home/runner/caches/pentaho/.m2:/root/.m2
+    
+    env:
+      NEXUS_DEPLOY_USER: ${{ secrets.PENTAHO_CICD_ONE_USER }}
+      NEXUS_DEPLOY_PASSWORD: ${{ secrets.PENTAHO_CICD_ONE_KEY }}
+      SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+      SONAR_TOKEN: ${{ secrets.WINGMAN_SONAR_TOKEN }}
 
     steps:
       - name: Checkout code
@@ -86,7 +87,6 @@ jobs:
         with:
           command: |
             mvn clean verify \
-            -Dmaven-surefire-plugin.testFailureIgnore=true \
             -Daudit
         env:
           cmd_type: "BUILD,UNIT_TEST"
