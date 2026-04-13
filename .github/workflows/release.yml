@@ -10,7 +10,6 @@ on:
 
 env:
   ARTIFACTORY_HOST: https://${{ vars.ARTIFACTORY_HOST }}
-  ARTIFACTORY_BASE_URL: ${ARTIFACTORY_HOST}/artifactory
 
 jobs:
   merge-workflow:
@@ -31,6 +30,10 @@ jobs:
   bump-version:
     needs: merge-workflow
     runs-on: [orl-lab]
+    permissions:
+      contents: write
+      pull-requests: write
+    
     container:
       image: ${{ vars.ARTIFACTORY_HOST }}/devops-docker-release/pentaho/actions-common:jdk21-20250717.225
       credentials:

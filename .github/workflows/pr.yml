@@ -29,29 +29,8 @@ jobs:
           checkAllCommitMessages: "true"
           accessToken: ${{ secrets.GITHUB_TOKEN }}
 
-  setup-maven-settings:
-    name: Setup Maven settings
-    runs-on: [orl-lab]
-    container:
-      image: ${{ vars.ARTIFACTORY_HOST }}/devops-docker-release/pentaho/actions-common:jdk21-20250717.225
-      credentials:
-        username: ${{ secrets.PENTAHO_CICD_ONE_USER }}
-        password: ${{ secrets.PENTAHO_CICD_ONE_KEY }}
-      volumes:
-        - /home/runner/caches/pentaho/.m2:/root/.m2
-    steps:
-      - name: Retrieve settings file
-        id: common-maven
-        uses: pentaho/actions-common@stable
-
-      - name: Copy settings.xml to .m2 directory
-        shell: sh
-        run: |
-          cp "${{ steps.common-maven.outputs.settings-file-path }}" /root/.m2
-
   build-and-test:
     name: Build & Test
-    needs: setup-maven-settings
     runs-on: [orl-lab]
     permissions:
       statuses: write
@@ -74,6 +53,15 @@ jobs:
       SONAR_TOKEN: ${{ secrets.WINGMAN_SONAR_TOKEN }}
 
     steps:
+      - name: Retrieve settings file
+        id: common-maven
+        uses: pentaho/actions-common@stable
+
+      - name: Setup Maven settings
+        shell: sh
+        run: |
+          cp "${{ steps.common-maven.outputs.settings-file-path }}" /root/.m2
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
