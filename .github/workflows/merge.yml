@@ -66,9 +66,19 @@ jobs:
 
     env:
       JFROG_CLI_BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      ARTIFACTORY_BASE_URL: ${{ format('https://{0}/artifactory', vars.ARTIFACTORY_HOST) }}
+      RESOLVE_REPO_MIRROR: ${{ format('https://{0}/artifactory/pnt-mvn', vars.ARTIFACTORY_HOST) }}
+      PUBLIC_RELEASE_REPO_URL: ${{ format('https://{0}/artifactory/pntpub-maven-dev', vars.ARTIFACTORY_HOST) }}
+      PRIVATE_RELEASE_REPO: pntprv-maven-dev
+      PRIVATE_RELEASE_REPO_URL: ${{ format('https://{0}/artifactory/pntprv-maven-dev', vars.ARTIFACTORY_HOST) }}
+      PUBLIC_SNAPSHOT_REPO_URL: ${{ format('https://{0}/artifactory/pntpub-maven-snapshot', vars.ARTIFACTORY_HOST) }}
+      PRIVATE_SNAPSHOT_REPO: pntprv-maven-snapshot
+      PRIVATE_SNAPSHOT_REPO_URL: ${{ format('https://{0}/artifactory/pntprv-maven-snapshot', vars.ARTIFACTORY_HOST) }}
       NEXUS_DEPLOY_USER: ${{ secrets.PENTAHO_CICD_ONE_USER }}
       NEXUS_DEPLOY_PASSWORD: ${{ secrets.PENTAHO_CICD_ONE_KEY }}
+      SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
       SONAR_TOKEN: ${{ secrets.WINGMAN_SONAR_TOKEN }}
+      SLACK_CHANNEL: yoda-prs
 
     steps:
       - name: Checkout code
@@ -163,6 +173,9 @@ jobs:
         password: ${{ secrets.PENTAHO_CICD_ONE_KEY }}
       volumes:
         - /home/runner/caches/pentaho/.m2:/root/.m2
+
+    env:
+      ARTIFACTORY_HOST: https://${{ vars.ARTIFACTORY_HOST }}
 
     steps:
       - name: Retrieve settings file
