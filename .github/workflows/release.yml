@@ -43,15 +43,6 @@ jobs:
         - /home/runner/caches/pentaho/.m2:/root/.m2
 
     steps:
-      - name: Retrieve settings file
-        id: common-maven
-        uses: pentaho/actions-common@stable
-
-      - name: Copy settings.xml to .m2 directory
-        shell: sh
-        run: |
-          cp "${{ steps.common-maven.outputs.settings-file-path }}" /root/.m2
-
       - name: Checkout source repo
         uses: actions/checkout@v4
 
