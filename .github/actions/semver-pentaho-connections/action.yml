@@ -1,5 +1,5 @@
 name: semver-pentaho-connections
-description: Manage semantic versioning for pentaho-connections
+description: Manage semantic versioning for pentaho-connections repository
 
 inputs:
   version-file:
