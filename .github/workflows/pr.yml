@@ -1,7 +1,7 @@
 # The GitHub Actions Workflow for Pull Requests in the main branch
 #
 
-name: pentaho-connections PR workflow
+name: pentaho-connections Pull Request workflow
 on:
   pull_request:
     branches: [ "semantic-versioned" ]
