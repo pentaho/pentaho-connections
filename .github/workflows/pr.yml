@@ -1,7 +1,7 @@
 # The GitHub Actions Workflow for Pull Requests in the main branch
 #
 
-name: pentaho-connections Pull Request workflow
+name: pentaho-connection PR workflow
 on:
   pull_request:
     branches: [ "semantic-versioned" ]
@@ -9,4 +9,7 @@ on:
 jobs:
   reusable-pr-workflow:
     uses: pentaho/actions-common/.github/workflows/pr.yml@stable
+    with:
+      slack_channels: ""
+      additional_mvn_directives: ""
     secrets: inherit
