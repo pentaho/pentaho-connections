@@ -9,7 +9,4 @@ on:
 jobs:
   reusable-pr-workflow:
     uses: pentaho/actions-common/.github/workflows/pr.yml@stable
-    with:
-      slack_channels: ""
-      additional_mvn_directives: ""
     secrets: inherit
