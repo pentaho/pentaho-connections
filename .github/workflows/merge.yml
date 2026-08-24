@@ -44,7 +44,7 @@ jobs:
     name: Setup Maven settings
     runs-on: [orl-lab]
     container:
-      image: ${{ vars.ARTIFACTORY_HOST }}/devops-docker-release/pentaho/actions-common:jdk21-20250717.225
+      image: ${{ vars.PDIA_AC_CONTAINER_IMAGE_JDK21 }}
       credentials:
         username: ${{ secrets.PENTAHO_CICD_ONE_USER }}
         password: ${{ secrets.PENTAHO_CICD_ONE_KEY }}
@@ -65,7 +65,7 @@ jobs:
     needs: setup-maven-settings
     runs-on: [orl-lab]
     container:
-      image: ${{ vars.ARTIFACTORY_HOST }}/devops-docker-release/pentaho/actions-common:jdk21-20250717.225
+      image: ${{ vars.PDIA_AC_CONTAINER_IMAGE_JDK21 }}
       credentials:
         username: ${{ secrets.PENTAHO_CICD_ONE_USER }}
         password: ${{ secrets.PENTAHO_CICD_ONE_KEY }}
@@ -177,7 +177,7 @@ jobs:
       pull-requests: write
     
     container:
-      image: ${{ vars.ARTIFACTORY_HOST }}/devops-docker-release/pentaho/actions-common:jdk21-20250717.225
+      image: ${{ vars.PDIA_AC_CONTAINER_IMAGE_JDK21 }}
       credentials:
         username: ${{ secrets.PENTAHO_CICD_ONE_USER }}
         password: ${{ secrets.PENTAHO_CICD_ONE_KEY }}
