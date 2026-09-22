@@ -31,7 +31,7 @@
   </scm>
   <properties>
     <commons-collections.version>3.2.2</commons-collections.version>
-    <mockito.version>5.10.0</mockito.version>
+    <mockito.version>5.23.0</mockito.version>
     <junit.version>4.13.2</junit.version>
     <argLine>
       --add-opens=java.base/java.lang=ALL-UNNAMED
